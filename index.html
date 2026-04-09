@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Журнал посещаемости</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* ЕДИНАЯ ПАНЕЛЬ УПРАВЛЕНИЯ ДИЗАЙНОМ */
+
+      /* Логин */
+      --login-width: 700px;  /* ширина блока входа */
+      --login-top: 25vh;     /* отступ сверху */
+      --login-left: auto;    /* выравнивание по горизонтали (auto / число px) */
+      --login-height: auto;  /* высота блока входа */
+      --login-shift-x:-20
+      px;  /* микро-сдвиг по оси X */
+
+      /* Таблица */
+      --main-width: 1200px;  /* максимальная ширина блока таблицы (или 95%) */
+      --main-top: 10vh;       /* отступ сверху */
+      --main-left: auto;     /* выравнивание по горизонтали */
+      --main-height: auto;   /* высота блока таблицы */
+      --main-shift-x: 0px;   /* микро-сдвиг по оси X */
+
+      /* Цвета и оформление (обычно не трогаем) */
+      --bg-body: #0f172a;
+      --bg-accent: #111827;
+      --bg-card: #020617;
+      --border-subtle: rgba(148, 163, 184, 0.25);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+      --shadow-soft: 0 22px 45px rgba(15, 23, 42, 0.8);
+      --radius-lg: 18px;
+      --radius-md: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1d2537 0, #020617 55%, #000 100%);
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      color: var(--text-main);
+      padding: 0 16px 40px;
+    }
+
+    .container {
+      width: 100%;
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(2, 6, 23, 0.98));
+      padding: 28px 32px 30px;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      overflow: hidden;
+    }
+
+    /* Login: настройки размеров и отступов через панель управления */
+    #login-page.container {
+      max-width: var(--login-width);
+      width: 100%;
+      height: var(--login-height);
+      margin-top: var(--login-top);
+      margin-left: var(--login-left);
+      margin-right: auto;
+      transform: translateX(var(--login-shift-x));
+    }
+
+    /* Main: настройки размеров и отступов через панель управления */
+    #main-page.container {
+      max-width: var(--main-width);
+      width: 100%;
+      height: var(--main-height);
+      margin-top: var(--main-top);
+      margin-left: var(--main-left);
+      margin-right: auto;
+      transform: translateX(var(--main-shift-x));
+    }
+
+    .container::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top left, rgba(79, 70, 229, 0.25), transparent 55%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    h1, h2 {
+      margin: 0 0 4px;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle {
+      text-align: center;
+      margin-top: 0;
+      margin-bottom: 24px;
+      font-size: 14px;
+      color: var(--text-muted);
+      position: relative;
+      z-index: 1;
+    }
+
+    .login-form {
+      max-width: 340px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    input[type="text"],
+    input[type="password"],
+    select {
+      width: 100%;
+      padding: 9px 11px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      background: rgba(15, 23, 42, 0.8);
+      color: var(--text-main);
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, transform 0.06s ease;
+      appearance: none;
+    }
+
+    input[type="text"]::placeholder,
+    input[type="password"]::placeholder {
+      color: rgba(148, 163, 184, 0.7);
+    }
+
+    input[type="text"]:focus,
+    input[type="password"]:focus,
+    select:focus {
+      border-color: rgba(129, 140, 248, 0.9);
+      box-shadow: 0 0 0 1px rgba(129, 140, 248, 0.6);
+      background: rgba(15, 23, 42, 0.95);
+      transform: translateY(-0.5px);
+    }
+
+    button {
+      padding: 9px 18px;
+      border: none;
+      border-radius: 999px;
+      background: radial-gradient(circle at top left, #6366f1, #4f46e5);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 12px 25px rgba(79, 70, 229, 0.5);
+      transition: transform 0.09s ease, box-shadow 0.12s ease, filter 0.12s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 18px 38px rgba(79, 70, 229, 0.55);
+      filter: brightness(1.05);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 10px 20px rgba(79, 70, 229, 0.4);
+    }
+
+    .error {
+      color: #fecaca;
+      background: rgba(239, 68, 68, 0.08);
+      border-radius: 999px;
+      border: 1px solid rgba(248, 113, 113, 0.4);
+      padding: 8px 12px;
+      margin-bottom: 14px;
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .login-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .forgot-password {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+
+    .forgot-password span {
+      color: #a5b4fc;
+      border-bottom: 1px dashed rgba(129, 140, 248, 0.7);
+    }
+
+    .forgot-password:hover span {
+      color: #c7d2fe;
+      border-bottom-color: rgba(129, 140, 248, 1);
+    }
+
+    .table-wrapper {
+      margin-top: 18px;
+      max-height: 450px;
+      overflow-y: auto;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.96));
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    th, td {
+      border-bottom: 1px solid rgba(15, 23, 42, 0.9);
+      padding: 9px 11px;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    thead th {
+      background: linear-gradient(120deg, rgba(15, 23, 42, 0.98), rgba(30, 64, 175, 0.85));
+      color: #e5e7eb;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      font-size: 11px;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    thead th::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 1px;
+      background: rgba(15, 23, 42, 0.8);
+    }
+
+    tbody tr:nth-child(even) {
+      background: rgba(15, 23, 42, 0.92);
+    }
+
+    tbody tr:nth-child(odd) {
+      background: rgba(15, 23, 42, 0.98);
+    }
+
+    /* Базовый hover только для строк "в школе" */
+    tbody tr.row-status-empty:hover {
+      background: rgba(30, 64, 175, 0.35);
+    }
+
+    /* Цвета строк по статусу */
+    .row-status-empty {
+      /* обычная строка (ученик в школе) — используем дефолтный фон */
+    }
+
+    .row-status-bolezn {
+      background: rgba(248, 113, 113, 0.25); /* нежно-красный */
+    }
+
+    .row-status-zayavlenie {
+      background: rgba(253, 224, 71, 0.25); /* нежно-жёлтый */
+    }
+
+    .row-status-neuvazh {
+      background: rgba(251, 146, 60, 0.25); /* светло-оранжевый */
+    }
+
+    /* Аккуратный скролл только для области с таблицей */
+    .table-wrapper::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .table-wrapper::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .table-wrapper::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.5);
+      border-radius: 999px;
+    }
+
+    .table-wrapper::-webkit-scrollbar-thumb:hover {
+      background: rgba(148, 163, 184, 0.8);
+    }
+
+    .table-wrapper {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(148, 163, 184, 0.6) transparent;
+    }
+
+    .actions-row {
+      margin-top: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 4px 2px;
+    }
+
+    /* Идеальное выравнивание кнопок в нижней панели */
+    .actions-row .logout-btn,
+    .actions-row .save-btn {
+      margin: 0;
+      padding: 9px 18px;
+      min-height: 38px;
+    }
+
+    .save-error {
+      margin-top: 10px;
+      text-align: right;
+      font-size: 13px;
+      color: #fecaca;
+    }
+
+    .save-btn {
+      background: radial-gradient(circle at top left, #22c55e, #16a34a);
+      box-shadow: 0 8px 18px rgba(34, 197, 94, 0.45);
+      padding-inline: 18px;
+      font-size: 13px;
+    }
+
+    .save-btn:hover {
+      box-shadow: 0 10px 22px rgba(34, 197, 94, 0.6);
+      filter: brightness(1.03);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 40;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease;
+    }
+
+    .modal-backdrop.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-content {
+      background: linear-gradient(145deg, #022c22, #022c22);
+      padding: 22px 28px 20px;
+      border-radius: 16px;
+      box-shadow: 0 22px 45px rgba(6, 78, 59, 0.85);
+      border: 1px solid rgba(52, 211, 153, 0.5);
+      text-align: center;
+      min-width: 260px;
+    }
+
+    .modal-icon {
+      font-size: 36px;
+      margin-bottom: 8px;
+      color: #4ade80;
+    }
+
+    .modal-text {
+      font-size: 15px;
+      color: #bbf7d0;
+    }
+
+    .top-bar {
+      text-align: center;
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .logout-btn {
+      margin-top: 0;
+      background: radial-gradient(circle at top left, #f97373, #ef4444);
+      box-shadow: 0 4px 12px rgba(229, 57, 53, 0.3);
+      padding-inline: 14px;
+      font-size: 13px;
+    }
+
+    .logout-btn:hover {
+      box-shadow: 0 6px 16px rgba(229, 57, 53, 0.34);
+      filter: brightness(1.02);
+    }
+
+    .admin-toolbar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .admin-toolbar label {
+      margin-bottom: 0;
+    }
+
+    .clear-btn {
+      background: transparent;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      box-shadow: none;
+      color: #e5e7eb;
+    }
+
+    .clear-btn:hover {
+      box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.7);
+      filter: none;
+      transform: none;
+    }
+
+    .status-select {
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      font-size: 13px;
+      padding-inline: 12px;
+    }
+
+    @media (max-width: 640px) {
+      .container {
+        padding: 22px 18px 24px;
+      }
+
+      table {
+        font-size: 12px;
+      }
+
+      th, td {
+        padding: 7px 8px;
+      }
+
+      .top-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Блок входа -->
+  <div class="container" id="login-page">
+    <h1>Вход</h1>
+    <p class="subtitle">Введите данные аккаунта администратора журнала</p>
+    <div class="login-form">
+      <div id="login-error" class="error" style="display:none;"></div>
+
+      <div class="form-group">
+        <label for="login">Логин</label>
+        <input type="text" id="login" />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Пароль</label>
+        <input type="password" id="password" />
+      </div>
+
+      <div class="login-actions">
+        <button id="login-btn">Войти</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Главная страница с таблицей -->
+  <div class="container" id="main-page" style="display:none;">
+    <div class="top-bar">
+      <h2 id="class-title">Журнал посещаемости</h2>
+    </div>
+
+    <!-- Панель администратора: выбор класса + ручной сброс -->
+    <div id="admin-panel" style="display:none;">
+      <div class="admin-toolbar">
+        <label for="admin-class-select" style="font-size:13px; color: var(--text-muted); margin-right: 6px;">
+          Выберите класс:
+        </label>
+        <select id="admin-class-select" class="status-select" style="max-width: 220px;">
+          <!-- варианты классов подставляются скриптом -->
+        </select>
+        <button id="clear-table-btn" class="clear-btn" type="button">Сбросить таблицу вручную</button>
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>№</th>
+            <th>ФИО ученика</th>
+            <th>Дата</th>
+            <th>Статус</th>
+          </tr>
+        </thead>
+        <tbody id="students-body">
+          <!-- строки учеников будут подставляться скриптом -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="actions-row">
+      <button class="logout-btn" id="logout-btn">Выйти</button>
+      <button class="save-btn" id="save-report-btn">Сохранить отчет</button>
+    </div>
+    <div id="save-error" class="save-error" style="display:none;">Ошибка связи с таблицей</div>
+  </div>
+
+  <div class="modal-backdrop" id="save-modal">
+    <div class="modal-content">
+      <div class="modal-icon">✔</div>
+      <div class="modal-text">Список сохранён!</div>
+    </div>
+  </div>
+
+  <script>
+    // DOM-ссылки
+    const loginPage = document.getElementById('login-page');
+    const mainPage = document.getElementById('main-page');
+    const loginInput = document.getElementById('login');
+    const passwordInput = document.getElementById('password');
+    const loginBtn = document.getElementById('login-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+    const loginError = document.getElementById('login-error');
+    const studentsBody = document.getElementById('students-body');
+    const classTitle = document.getElementById('class-title');
+    const adminPanel = document.getElementById('admin-panel');
+    const adminClassSelect = document.getElementById('admin-class-select');
+    const saveReportBtn = document.getElementById('save-report-btn');
+    const saveModal = document.getElementById('save-modal');
+    const saveError = document.getElementById('save-error');
+    const clearTableBtn = document.getElementById('clear-table-btn');
+
+    // Конфигурация пользователей и классов
+    const USERS = [
+      {
+        login: '10b',
+        password: '10b',
+        classId: '10B',
+        className: '10 «Б»',
+        students: [
+          'Бойко Роман',
+          'Гетман Дмитрий',
+          'Годинская София',
+          'Голубева Алена',
+          'Грибло Марта',
+          'Громова Влада',
+          'Гутковский Руслан',
+          'Дашкевич Тимур',
+          'Дорогокупец Богдан',
+          'Дубяго Захарий',
+          'Климук Михаил',
+          'Ковальчук Михаил',
+          'Ковриго Александр',
+          'Коляга Юрий',
+          'Королева Полина',
+          'Кособуко Татьяна',
+          'Кудрицкий Даниил',
+          'Лаптенок Анфиса',
+          'Лиходиевская Ольга',
+          'Матиевский Тимур',
+          'Матюта Иван',
+          'Месник Тимофей',
+          'Минич Елизавета',
+          'Орлевич Дарья',
+          'Позднякова Наталья',
+          'Потапейко Константин',
+          'Савенко Владислав',
+          'Севрук Елизавета',
+          'Сорокин Александр',
+          'Туровец Кирилл',
+          'Шелег Мария',
+          'Шеремет Захар',
+          'Шостак Диана'
+        ]
+      },
+      {
+        login: '10v',
+        password: '10v',
+        classId: '10V',
+        className: '10 «В»',
+        students: [
+          'Антюкова Катерина',
+          'Бакун Ксения',
+          'Бальцевич Владислав',
+          'Батовская Софья',
+          'Вавилов Максим',
+          'Витебская Мария',
+          'Гапонов Артем',
+          'Давыдова Елизавета',
+          'Демьянович Маргарита',
+          'Дождикова Евгения',
+          'Дубровка Илья',
+          'Криштопчик Мария',
+          'Курадовец Милана',
+          'Кучинская Варвара',
+          'Лукьянова Полина',
+          'Матусевич Полина',
+          'Матюш Алина',
+          'Митуневич Милана',
+          'Мозговая Карина',
+          'Мойская Анна',
+          'Нижников Егор',
+          'Певнев Егор',
+          'Ратько Яна',
+          'Рогатко Ника',
+          'Романовская Александра',
+          'Савсюк Данила',
+          'Сушко Елизавета',
+          'Телего Алина',
+          'Токарчук Маргарита',
+          'Широкова Дарья'
+        ]
+      },
+      {
+        login: '10a',
+        password: '10a',
+        classId: '10A',
+        className: '10 «А»',
+        students: [
+          'Андреев Алексей',
+          'Артус Глеб',
+          'Врублевский Иван',
+          'Герасимович Виктория',
+          'Гетман Марина',
+          'Дедюля Анастасия',
+          'Дубойская Маргарита',
+          'Елисеева Ксения',
+          'Журневич Анастасия',
+          'Зенько Ангелина',
+          'Иванова Светлана',
+          'Клинцов Даниил',
+          'Ковзик Мария',
+          'Кузьмич Елизавета',
+          'Куликовская Валерия',
+          'Куянцева Анна',
+          'Лазюк Полина',
+          'Лускина Мария',
+          'Матвеева Дарья',
+          'Мойская Софья',
+          'Петрова Карина',
+          'Ромашко Камила',
+          'Русаловская Софья',
+          'Ручкин Александр',
+          'Свиридович Анна',
+          'Солдатенко Вера',
+          'Солодуха Яна',
+          'Стригин Фадей',
+          'Ульянко Ксения',
+          'Фадеева Вера',
+          'Черкасова Стефания',
+          'Шуликова Марьяна',
+          'Щуцкая Амелия'
+        ]
+      }
+    ];
+
+    let currentClassConfig = null;
+    let currentRole = null; // 'admin' | 'user' | null
+    let currentLogin = null;
+
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwvHISTqLhR1kkUt5Uhas88xAuKuKC1FOlUUIhAhXaYaGhgKtLLh7Aye4lqdSCM-igHyw/exec';
+
+    const CLASSES = USERS.map(u => ({
+      classId: u.classId,
+      className: u.className,
+      students: u.students
+    }));
+
+    const STORAGE_PREFIX = 'attendance_journal_class_';
+    const STORAGE_DATE_KEY = 'attendance_journal_last_date';
+
+    function getStorageKey(classId) {
+      return STORAGE_PREFIX + classId;
+    }
+
+    function loadStatuses(classId) {
+      try {
+        const raw = localStorage.getItem(getStorageKey(classId));
+        if (!raw) return {};
+        const parsed = JSON.parse(raw);
+        return parsed && typeof parsed === 'object' ? parsed : {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function saveStatuses(classId, statuses) {
+      try {
+        localStorage.setItem(getStorageKey(classId), JSON.stringify(statuses));
+      } catch (e) {
+        // игнорируем ошибки localStorage
+      }
+    }
+
+    function clearStatusesForClass(classId) {
+      try {
+        localStorage.removeItem(getStorageKey(classId));
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    function clearStatusesForAllClasses() {
+      USERS.forEach(u => clearStatusesForClass(u.classId));
+    }
+
+    function getTodayKey() {
+      const today = new Date();
+      const y = today.getFullYear();
+      const m = String(today.getMonth() + 1).padStart(2, '0');
+      const d = String(today.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function ensureDailyReset() {
+      const todayKey = getTodayKey();
+      const stored = localStorage.getItem(STORAGE_DATE_KEY);
+      if (stored !== todayKey) {
+        clearStatusesForAllClasses();
+        localStorage.setItem(STORAGE_DATE_KEY, todayKey);
+      }
+    }
+
+    // Выполняем проверку и возможный сброс при загрузке страницы
+    ensureDailyReset();
+
+    function applyRowStatusClass(tr, status) {
+      tr.classList.remove(
+        'row-status-empty',
+        'row-status-bolezn',
+        'row-status-zayavlenie',
+        'row-status-neuvazh'
+      );
+
+      switch (status) {
+        case 'bolezn':
+          tr.classList.add('row-status-bolezn');
+          break;
+        case 'zayavlenie':
+          tr.classList.add('row-status-zayavlenie');
+          break;
+        case 'neuvazh':
+          tr.classList.add('row-status-neuvazh');
+          break;
+        default:
+          tr.classList.add('row-status-empty');
+      }
+    }
+
+    function renderTableForClass(classConfig) {
+      const statuses = loadStatuses(classConfig.classId);
+      studentsBody.innerHTML = '';
+
+      classConfig.students.forEach((fullName, index) => {
+        const rowStatus = statuses[index] || ''; // '' = "—"
+
+        const tr = document.createElement('tr');
+        applyRowStatusClass(tr, rowStatus);
+
+        const tdIndex = document.createElement('td');
+        tdIndex.textContent = String(index + 1);
+
+        const tdName = document.createElement('td');
+        tdName.textContent = fullName;
+
+        const tdDate = document.createElement('td');
+        const today = new Date();
+        const day = String(today.getDate()).padStart(2, '0');
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const year = today.getFullYear();
+        tdDate.textContent = `${day}.${month}.${year}`;
+
+        const tdStatus = document.createElement('td');
+        const select = document.createElement('select');
+        select.className = 'status-select';
+
+        const options = [
+          { value: '', label: '—' },
+          { value: 'bolezn', label: 'Болезнь' },
+          { value: 'zayavlenie', label: 'Заявление' },
+          { value: 'neuvazh', label: 'Неуважительная' }
+        ];
+
+        options.forEach(opt => {
+          const optionEl = document.createElement('option');
+          optionEl.value = opt.value;
+          optionEl.textContent = opt.label;
+          select.appendChild(optionEl);
+        });
+
+        select.value = rowStatus;
+
+        select.addEventListener('change', () => {
+          const updatedStatuses = loadStatuses(classConfig.classId);
+          updatedStatuses[index] = select.value;
+          saveStatuses(classConfig.classId, updatedStatuses);
+          applyRowStatusClass(tr, select.value);
+        });
+
+        tdStatus.appendChild(select);
+
+        tr.appendChild(tdIndex);
+        tr.appendChild(tdName);
+        tr.appendChild(tdDate);
+        tr.appendChild(tdStatus);
+
+        studentsBody.appendChild(tr);
+      });
+    }
+
+    loginBtn.addEventListener('click', () => {
+      const login = loginInput.value.trim();
+      const password = passwordInput.value;
+
+      // Приоритетный админский вход
+      if (login === 'admin' && password === '123') {
+        currentRole = 'admin';
+        currentLogin = 'admin';
+        loginError.style.display = 'none';
+
+        // Заполняем список классов для админа
+        adminClassSelect.innerHTML = '';
+        CLASSES.forEach(cls => {
+          const opt = document.createElement('option');
+          opt.value = cls.classId;
+          opt.textContent = cls.className;
+          adminClassSelect.appendChild(opt);
+        });
+
+        // При первом входе админ сразу видит первый класс (если есть)
+        if (CLASSES.length > 0) {
+          const first = CLASSES[0];
+          adminClassSelect.value = first.classId;
+          currentClassConfig = first;
+          classTitle.textContent = `Журнал посещаемости: ${first.className}`;
+          renderTableForClass(first);
+        } else {
+          classTitle.textContent = 'Журнал посещаемости';
+          studentsBody.innerHTML = '';
+        }
+
+        adminPanel.style.display = 'block';
+        clearTableBtn.style.display = 'inline-flex';
+
+        loginInput.value = '';
+        passwordInput.value = '';
+        loginPage.style.display = 'none';
+        mainPage.style.display = 'block';
+        return;
+      }
+
+      // Обычный вход (староста конкретного класса)
+      const foundUser = USERS.find(
+        (u) => u.login === login && u.password === password
+      );
+
+      if (foundUser) {
+        currentRole = 'user';
+        currentLogin = foundUser.login;
+        loginError.style.display = 'none';
+        currentClassConfig = foundUser;
+
+        // Обновляем заголовок с названием класса
+        classTitle.textContent = `Журнал посещаемости: ${foundUser.className}`;
+
+        renderTableForClass(foundUser);
+
+        adminPanel.style.display = 'none';
+        clearTableBtn.style.display = 'none';
+
+        loginInput.value = '';
+        passwordInput.value = '';
+        loginPage.style.display = 'none';
+        mainPage.style.display = 'block';
+      } else {
+        loginError.textContent = 'Неверный логин или пароль.';
+        loginError.style.display = 'block';
+      }
+    });
+
+    // Переключение классов в панели администратора
+    adminClassSelect.addEventListener('change', () => {
+      if (currentRole !== 'admin') return;
+      const classId = adminClassSelect.value;
+      const cls = CLASSES.find(c => c.classId === classId);
+      if (!cls) return;
+      currentClassConfig = cls;
+      classTitle.textContent = `Журнал посещаемости: ${cls.className}`;
+      renderTableForClass(cls);
+    });
+
+    // По Enter тоже вход
+    [loginInput, passwordInput].forEach(input => {
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          loginBtn.click();
+        }
+      });
+    });
+
+    // Кнопка "Выйти"
+    logoutBtn.addEventListener('click', () => {
+      mainPage.style.display = 'none';
+      loginPage.style.display = 'block';
+      currentClassConfig = null;
+      currentLogin = null;
+      classTitle.textContent = 'Журнал посещаемости';
+      studentsBody.innerHTML = '';
+      adminPanel.style.display = 'none';
+      currentRole = null;
+      saveError.style.display = 'none';
+    });
+
+    // Кнопка "Сбросить таблицу вручную" (для админа, текущий выбранный класс)
+    clearTableBtn.addEventListener('click', () => {
+      if (currentRole !== 'admin' || !currentClassConfig) return;
+      clearStatusesForClass(currentClassConfig.classId);
+      renderTableForClass(currentClassConfig);
+    });
+
+    // Кнопка "Сохранить отчет"
+    saveReportBtn.addEventListener('click', async () => {
+      if (!currentClassConfig) return;
+
+      saveError.style.display = 'none';
+
+      const oldBtnText = saveReportBtn.textContent;
+      saveReportBtn.textContent = 'Отправка...';
+      saveReportBtn.disabled = true;
+
+      // Собираем данные из таблицы
+      const statuses = {};
+      const absentList = [];
+      const rows = studentsBody.querySelectorAll('tr');
+
+      rows.forEach((tr, index) => {
+        const select = tr.querySelector('select.status-select');
+        if (!select) return;
+        const value = select.value;
+        statuses[index] = value;
+
+        if (value) {
+          absentList.push({
+            name: currentClassConfig.students[index],
+            status: value
+          });
+        }
+      });
+
+      // 1) Сначала отправляем в Google Таблицу (только непустые)
+      const payload = {
+        className: currentClassConfig.className,
+        user: currentLogin,
+        absentList
+      };
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 12000);
+
+        const resp = await fetch(GOOGLE_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        // В режиме no-cors ответ будет opaque, поэтому считаем успехом факт выполнения запроса без исключения.
+
+        // 2) Потом сохраняем в localStorage (все статусы)
+        saveStatuses(currentClassConfig.classId, statuses);
+
+        // Успех: показываем зелёную галочку (как раньше)
+        saveModal.classList.add('visible');
+        setTimeout(() => {
+          saveModal.classList.remove('visible');
+        }, 1500);
+      } catch (e) {
+        saveError.style.display = 'block';
+      } finally {
+        saveReportBtn.textContent = oldBtnText;
+        saveReportBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
+
