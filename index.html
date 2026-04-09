@@ -2,6 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Журнал посещаемости</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,8 +16,7 @@
       --login-top: 25vh;     /* отступ сверху */
       --login-left: auto;    /* выравнивание по горизонтали (auto / число px) */
       --login-height: auto;  /* высота блока входа */
-      --login-shift-x:-20
-      px;  /* микро-сдвиг по оси X */
+      --login-shift-x: -20px;  /* микро-сдвиг по оси X */
 
       /* Таблица */
       --main-width: 1200px;  /* максимальная ширина блока таблицы (или 95%) */
@@ -457,23 +457,181 @@
       padding-inline: 12px;
     }
 
-    @media (max-width: 640px) {
+    /* Десктоп: контейнеры до ~1000px, по центру (max-width + var из :root) */
+    @media (min-width: 1025px) {
+      #login-page.container {
+        max-width: min(var(--login-width), 1000px);
+      }
+
+      #main-page.container {
+        max-width: min(var(--main-width), 1000px);
+      }
+    }
+
+    /* Планшет: ширина ~90%, крупнее зона нажатия у кнопок */
+    @media (max-width: 1024px) {
+      body {
+        padding: 0 12px 32px;
+      }
+
+      #login-page.container,
+      #main-page.container {
+        max-width: 90%;
+        width: 100%;
+        transform: none;
+      }
+
+      button,
+      .logout-btn,
+      .save-btn,
+      .clear-btn {
+        min-height: 44px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }
+
+      .actions-row .logout-btn,
+      .actions-row .save-btn {
+        min-height: 44px;
+      }
+
+      .admin-toolbar {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+    }
+
+    /* Смартфон: узкий контейнер, крупный текст и поля под палец */
+    @media (max-width: 480px) {
+      body {
+        font-size: 17px;
+        padding: 0 4px 20px;
+      }
+
       .container {
-        padding: 22px 18px 24px;
+        max-width: 98%;
+        width: 100%;
+        padding: 10px;
+      }
+
+      #login-page.container,
+      #main-page.container {
+        max-width: 98%;
+        width: 100%;
+        transform: none;
+      }
+
+      h1, h2 {
+        font-size: clamp(1.25rem, 5vw, 1.5rem);
+      }
+
+      .subtitle {
+        font-size: 16px;
+      }
+
+      label {
+        font-size: 15px;
+      }
+
+      input[type="text"],
+      input[type="password"],
+      select,
+      .status-select {
+        width: 100%;
+        max-width: 100%;
+        min-height: 44px;
+        font-size: 16px;
+      }
+
+      .login-form {
+        max-width: 100%;
+      }
+
+      .login-actions {
+        width: 100%;
+      }
+
+      .login-actions button {
+        width: 100%;
+        max-width: 100%;
+        min-height: 44px;
+        font-size: 16px;
+      }
+
+      button:not(.clear-btn),
+      .logout-btn,
+      .save-btn {
+        width: 100%;
+        max-width: 100%;
+        min-height: 44px;
+        font-size: 16px;
+      }
+
+      .clear-btn {
+        width: 100%;
+        max-width: 100%;
+        min-height: 44px;
+        font-size: 14px;
       }
 
       table {
-        font-size: 12px;
+        font-size: 14px;
       }
 
       th, td {
-        padding: 7px 8px;
+        padding: 8px 6px;
+        font-size: 14px;
       }
 
-      .top-bar {
+      thead th {
+        font-size: 10px;
+      }
+
+      .error {
+        font-size: 14px;
+      }
+
+      .actions-row {
         flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
+        align-items: stretch;
+        gap: 10px;
+        padding: 8px 2px 4px;
+      }
+
+      .actions-row .logout-btn,
+      .actions-row .save-btn {
+        width: 100%;
+        max-width: 100%;
+        min-height: 44px;
+      }
+
+      .save-error {
+        text-align: center;
+        font-size: 14px;
+      }
+
+      .admin-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+
+      .admin-toolbar .status-select {
+        max-width: 100% !important;
+        width: 100%;
+      }
+
+      .table-wrapper {
+        max-height: min(450px, 50vh);
+      }
+
+      .modal-content {
+        max-width: 92vw;
+        margin: 0 12px;
+      }
+
+      .modal-text {
+        font-size: 16px;
       }
     }
   </style>
@@ -697,7 +855,7 @@
     let currentRole = null; // 'admin' | 'user' | null
     let currentLogin = null;
 
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwvHISTqLhR1kkUt5Uhas88xAuKuKC1FOlUUIhAhXaYaGhgKtLLh7Aye4lqdSCM-igHyw/exec';
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxEKhBTHd5a5HkQGOQyfHpFElkr7xCxD4DcGko2HR6ESsGdByGCqPQmxx7oAPRrDoc9Ng/exec';
 
     const CLASSES = USERS.map(u => ({
       classId: u.classId,
@@ -988,6 +1146,7 @@
 
       // 1) Сначала отправляем в Google Таблицу (только непустые)
       const payload = {
+        secret: 'lil_freat_sdelal_eto',
         className: currentClassConfig.className,
         user: currentLogin,
         absentList
@@ -1000,7 +1159,7 @@
         const resp = await fetch(GOOGLE_SCRIPT_URL, {
           method: 'POST',
           mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'text/plain' },
           body: JSON.stringify(payload),
           signal: controller.signal
         });
