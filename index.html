@@ -7,38 +7,93 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
   <style>
     :root {
-      /* ЕДИНАЯ ПАНЕЛЬ УПРАВЛЕНИЯ ДИЗАЙНОМ */
+      /* Палитра Modern Dark SaaS */
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --bg-main: #0f172a;
+      --bg-card: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+      --radius: 16px;
 
-      /* Логин */
-      --login-width: 700px;  /* ширина блока входа */
-      --login-top: 25vh;     /* отступ сверху */
-      --login-left: auto;    /* выравнивание по горизонтали (auto / число px) */
-      --login-height: auto;  /* высота блока входа */
-      --login-shift-x: -20px;  /* микро-сдвиг по оси X */
-
-      /* Таблица */
-      --main-width: 1200px;  /* максимальная ширина блока таблицы (или 95%) */
-      --main-top: 10vh;       /* отступ сверху */
-      --main-left: auto;     /* выравнивание по горизонтали */
-      --main-height: auto;   /* высота блока таблицы */
-      --main-shift-x: 0px;   /* микро-сдвиг по оси X */
-
-      /* Цвета и оформление (обычно не трогаем) */
-      --bg-body: #0f172a;
-      --bg-accent: #111827;
-      --bg-card: #020617;
-      --border-subtle: rgba(148, 163, 184, 0.25);
-      --text-main: #e5e7eb;
-      --text-muted: #9ca3af;
-      --primary: #4f46e5;
-      --primary-hover: #4338ca;
+      /* Семантика (всё из корня) */
+      --success: #22c55e;
+      --success-hover: #16a34a;
       --danger: #ef4444;
       --danger-hover: #dc2626;
-      --shadow-soft: 0 22px 45px rgba(15, 23, 42, 0.8);
-      --radius-lg: 18px;
-      --radius-md: 10px;
+      --focus-ring: 0 0 0 3px rgba(99, 102, 241, 0.28);
+      --shadow-input-focus: var(--focus-ring), 0 4px 14px rgba(2, 6, 23, 0.55);
+      --shadow-card: 0 20px 45px rgba(2, 6, 23, 0.55), 0 8px 18px rgba(0, 0, 0, 0.32);
+      --shadow-btn-primary: 0 10px 24px rgba(79, 70, 229, 0.32), 0 3px 8px rgba(0, 0, 0, 0.35);
+      --shadow-btn-primary-hover: 0 14px 30px rgba(79, 70, 229, 0.38), 0 4px 12px rgba(0, 0, 0, 0.4);
+      --table-header-bg: #273449;
+      --table-row-alt: #223045;
+      --table-row-hover: rgba(99, 102, 241, 0.18);
+      --scrollbar-thumb: #475569;
+      --scrollbar-thumb-hover: #64748b;
+      --modal-backdrop: rgba(2, 6, 23, 0.7);
+      --modal-success-icon: var(--success);
+      --modal-success-text: #dcfce7;
+      --link-accent: var(--primary);
+      --surface-elevated: #0f1a2d;
+      --surface-overlay: #162033;
+      --table-edge: rgba(255, 255, 255, 0.04);
+
+      /* Отступы и сетка */
+      --space-xs: 6px;
+      --space-sm: 10px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      --pad-page-x: 16px;
+      --pad-page-b: 40px;
+      --pad-card: 24px;
+      --pad-card-y: 24px;
+      --pad-card-x: 24px;
+      --gap-stack: var(--space-md);
+      --gap-form: 18px;
+      --pad-input-y: 10px;
+      --pad-input-x: 14px;
+      --pad-btn-y: 10px;
+      --pad-btn-x: 18px;
+      --form-max-width: 340px;
+      --table-max-height: 450px;
+
+      /* Логин / главная — размеры контейнеров */
+      --login-width: 700px;
+      --login-top: 25vh;
+      --login-left: auto;
+      --login-height: auto;
+      --login-shift-x: -20px;
+      --main-width: 1200px;
+      --main-top: 10vh;
+      --main-left: auto;
+      --main-height: auto;
+      --main-shift-x: 0px;
+    }
+
+    @media (max-width: 480px) {
+      :root {
+        --radius: 16px;
+        --pad-page-x: 20px;
+        --pad-page-b: 28px;
+        --pad-card: 20px;
+        --pad-card-y: 22px;
+        --pad-card-x: 20px;
+        --gap-stack: 20px;
+        --gap-form: 20px;
+        --space-md: 20px;
+        --space-lg: 28px;
+      }
     }
 
     * {
@@ -47,30 +102,29 @@
 
     body {
       font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #1d2537 0, #020617 55%, #000 100%);
+      background:
+        radial-gradient(circle at top, rgba(99, 102, 241, 0.16), transparent 34%),
+        linear-gradient(180deg, #111827 0%, var(--bg-main) 38%, #020617 100%);
       margin: 0;
       min-height: 100vh;
       display: flex;
       align-items: flex-start;
       justify-content: center;
       color: var(--text-main);
-      padding: 0 16px 40px;
+      padding: 0 var(--pad-page-x) var(--pad-page-b);
     }
 
     .container {
       width: 100%;
-      background: linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(2, 6, 23, 0.98));
-      padding: 28px 32px 30px;
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-soft);
-      border: 1px solid rgba(148, 163, 184, 0.3);
-      overflow: hidden;
+      background: transparent;
+      padding: 0;
+      border: none;
+      box-shadow: none;
+      position: relative;
     }
 
-    /* Login: настройки размеров и отступов через панель управления */
     #login-page.container {
       max-width: var(--login-width);
-      width: 100%;
       height: var(--login-height);
       margin-top: var(--login-top);
       margin-left: var(--login-left);
@@ -78,58 +132,65 @@
       transform: translateX(var(--login-shift-x));
     }
 
-    /* Main: настройки размеров и отступов через панель управления */
     #main-page.container {
       max-width: var(--main-width);
-      width: 100%;
       height: var(--main-height);
       margin-top: var(--main-top);
       margin-left: var(--main-left);
       margin-right: auto;
       transform: translateX(var(--main-shift-x));
+      display: flex;
+      flex-direction: column;
+      gap: var(--gap-stack);
     }
 
-    .container::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at top left, rgba(79, 70, 229, 0.25), transparent 55%);
-      opacity: 0.9;
-      pointer-events: none;
+    .card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-card);
+      padding: var(--pad-card-y) var(--pad-card-x);
+    }
+
+    .card--flush {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .card--flush .table-wrapper {
+      margin-top: 0;
+      border: none;
+      border-radius: 0;
     }
 
     h1, h2 {
-      margin: 0 0 4px;
+      margin: 0 0 var(--space-xs);
       text-align: center;
-      position: relative;
-      z-index: 1;
-      letter-spacing: 0.02em;
+      color: var(--text-main);
+      letter-spacing: -0.02em;
+      font-weight: 600;
     }
 
     .subtitle {
       text-align: center;
-      margin-top: 0;
-      margin-bottom: 24px;
+      margin: 0 0 var(--space-lg);
       font-size: 14px;
       color: var(--text-muted);
-      position: relative;
-      z-index: 1;
+      line-height: 1.5;
     }
 
     .login-form {
-      max-width: 340px;
+      max-width: var(--form-max-width);
       margin: 0 auto;
-      position: relative;
-      z-index: 1;
     }
 
     .form-group {
-      margin-bottom: 18px;
+      margin-bottom: var(--gap-form);
     }
 
     label {
       display: block;
-      margin-bottom: 6px;
+      margin-bottom: var(--space-xs);
       font-weight: 500;
       font-size: 13px;
       color: var(--text-muted);
@@ -139,36 +200,35 @@
     input[type="password"],
     select {
       width: 100%;
-      padding: 9px 11px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.45);
-      background: rgba(15, 23, 42, 0.8);
+      padding: var(--pad-input-y) var(--pad-input-x);
+      border-radius: var(--radius);
+      border: 1px solid var(--border-color);
+      background-color: var(--surface-elevated);
       color: var(--text-main);
       font-size: 14px;
       outline: none;
-      transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, transform 0.06s ease;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
       appearance: none;
     }
 
     input[type="text"]::placeholder,
     input[type="password"]::placeholder {
-      color: rgba(148, 163, 184, 0.7);
+      color: var(--text-muted);
+      opacity: 0.85;
     }
 
     input[type="text"]:focus,
     input[type="password"]:focus,
     select:focus {
-      border-color: rgba(129, 140, 248, 0.9);
-      box-shadow: 0 0 0 1px rgba(129, 140, 248, 0.6);
-      background: rgba(15, 23, 42, 0.95);
-      transform: translateY(-0.5px);
+      border-color: var(--primary);
+      box-shadow: var(--shadow-input-focus);
     }
 
     button {
-      padding: 9px 18px;
+      padding: var(--pad-btn-y) var(--pad-btn-x);
       border: none;
-      border-radius: 999px;
-      background: radial-gradient(circle at top left, #6366f1, #4f46e5);
+      border-radius: var(--radius);
+      background-color: var(--primary);
       color: #fff;
       font-size: 14px;
       font-weight: 500;
@@ -176,29 +236,34 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      box-shadow: 0 12px 25px rgba(79, 70, 229, 0.5);
-      transition: transform 0.09s ease, box-shadow 0.12s ease, filter 0.12s ease;
+      gap: var(--space-xs);
+      box-shadow: var(--shadow-btn-primary);
+      transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.12s ease;
     }
 
     button:hover {
+      background-color: var(--primary-hover);
+      box-shadow: var(--shadow-btn-primary-hover);
       transform: translateY(-1px);
-      box-shadow: 0 18px 38px rgba(79, 70, 229, 0.55);
-      filter: brightness(1.05);
     }
 
     button:active {
       transform: translateY(0);
-      box-shadow: 0 10px 20px rgba(79, 70, 229, 0.4);
+    }
+
+    button:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      transform: none;
     }
 
     .error {
       color: #fecaca;
-      background: rgba(239, 68, 68, 0.08);
-      border-radius: 999px;
-      border: 1px solid rgba(248, 113, 113, 0.4);
-      padding: 8px 12px;
-      margin-bottom: 14px;
+      background: rgba(239, 68, 68, 0.12);
+      border-radius: var(--radius);
+      border: 1px solid rgba(248, 113, 113, 0.28);
+      padding: var(--space-sm) var(--space-md);
+      margin-bottom: var(--space-md);
       text-align: center;
       font-size: 13px;
     }
@@ -207,8 +272,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 10px;
-      margin-top: 4px;
+      gap: var(--space-sm);
+      margin-top: var(--space-xs);
     }
 
     .forgot-password {
@@ -219,91 +284,85 @@
     }
 
     .forgot-password span {
-      color: #a5b4fc;
-      border-bottom: 1px dashed rgba(129, 140, 248, 0.7);
+      color: var(--link-accent);
+      border-bottom: 1px dashed rgba(79, 70, 229, 0.45);
     }
 
     .forgot-password:hover span {
-      color: #c7d2fe;
-      border-bottom-color: rgba(129, 140, 248, 1);
+      color: var(--primary-hover);
+      border-bottom-color: var(--primary-hover);
     }
 
     .table-wrapper {
-      margin-top: 18px;
-      max-height: 450px;
+      margin-top: var(--space-md);
+      max-height: var(--table-max-height);
       overflow-y: auto;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border-subtle);
-      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.96));
+      border-radius: var(--radius);
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-card);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+    }
+
+    .card--flush .table-wrapper {
+      background-color: transparent;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      border-radius: var(--radius-md);
+      border-radius: var(--radius);
       overflow: hidden;
     }
 
     th, td {
-      border-bottom: 1px solid rgba(15, 23, 42, 0.9);
-      padding: 9px 11px;
+      border-bottom: 1px solid var(--border-color);
+      padding: var(--space-sm) var(--space-md);
       text-align: left;
       font-size: 13px;
+      color: var(--text-main);
     }
 
     thead th {
-      background: linear-gradient(120deg, rgba(15, 23, 42, 0.98), rgba(30, 64, 175, 0.85));
-      color: #e5e7eb;
-      font-weight: 500;
-      letter-spacing: 0.02em;
+      background-color: var(--table-header-bg);
+      color: var(--text-muted);
+      font-weight: 600;
+      letter-spacing: 0.04em;
       text-transform: uppercase;
       font-size: 11px;
       position: sticky;
       top: 0;
       z-index: 2;
-    }
-
-    thead th::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: -1px;
-      height: 1px;
-      background: rgba(15, 23, 42, 0.8);
+      border-bottom: 1px solid var(--border-color);
     }
 
     tbody tr:nth-child(even) {
-      background: rgba(15, 23, 42, 0.92);
+      background-color: var(--table-row-alt);
     }
 
     tbody tr:nth-child(odd) {
-      background: rgba(15, 23, 42, 0.98);
+      background-color: var(--bg-card);
     }
 
-    /* Базовый hover только для строк "в школе" */
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
     tbody tr.row-status-empty:hover {
-      background: rgba(30, 64, 175, 0.35);
-    }
-
-    /* Цвета строк по статусу */
-    .row-status-empty {
-      /* обычная строка (ученик в школе) — используем дефолтный фон */
+      background-color: var(--table-row-hover);
     }
 
     .row-status-bolezn {
-      background: rgba(248, 113, 113, 0.25); /* нежно-красный */
+      background-color: rgba(248, 113, 113, 0.18);
     }
 
     .row-status-zayavlenie {
-      background: rgba(253, 224, 71, 0.25); /* нежно-жёлтый */
+      background-color: rgba(250, 204, 21, 0.18);
     }
 
     .row-status-neuvazh {
-      background: rgba(251, 146, 60, 0.25); /* светло-оранжевый */
+      background-color: rgba(249, 115, 22, 0.18);
     }
 
-    /* Аккуратный скролл только для области с таблицей */
     .table-wrapper::-webkit-scrollbar {
       width: 6px;
     }
@@ -313,59 +372,101 @@
     }
 
     .table-wrapper::-webkit-scrollbar-thumb {
-      background: rgba(148, 163, 184, 0.5);
-      border-radius: 999px;
+      background: var(--scrollbar-thumb);
+      border-radius: var(--radius);
     }
 
     .table-wrapper::-webkit-scrollbar-thumb:hover {
-      background: rgba(148, 163, 184, 0.8);
+      background: var(--scrollbar-thumb-hover);
     }
 
     .table-wrapper {
       scrollbar-width: thin;
-      scrollbar-color: rgba(148, 163, 184, 0.6) transparent;
+      scrollbar-color: var(--scrollbar-thumb) transparent;
     }
 
     .actions-row {
-      margin-top: 16px;
+      margin-top: 20px;
       display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
       justify-content: space-between;
       align-items: center;
-      gap: 12px;
-      padding: 6px 4px 2px;
+      height: 60px;
+      width: 100%;
+      gap: 20px;
+      padding: var(--space-xs) 0 0;
     }
 
-    /* Идеальное выравнивание кнопок в нижней панели */
     .actions-row .logout-btn,
+    .actions-row .save-btn,
+    .actions-row .stats-btn {
+      margin: 0 !important;
+      flex: 0 0 auto;
+      box-sizing: border-box !important;
+      width: 160px !important;
+      min-width: 160px;
+      max-width: 160px;
+      height: 40px !important;
+      min-height: 40px;
+      max-height: 40px;
+      padding: 0 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      vertical-align: middle;
+      text-align: center;
+      font-size: 16px !important;
+      font-weight: 600;
+      line-height: 40px;
+    }
+
     .actions-row .save-btn {
-      margin: 0;
-      padding: 9px 18px;
-      min-height: 38px;
+      margin-top: 0 !important;
+      position: static !important;
+      top: auto !important;
+      margin-bottom: 2px;
+      line-height: 40px !important;
+    }
+
+    .actions-row .logout-btn {
+      line-height: 40px !important;
     }
 
     .save-error {
-      margin-top: 10px;
+      margin-top: var(--space-sm);
       text-align: right;
       font-size: 13px;
-      color: #fecaca;
+      color: var(--danger);
     }
 
     .save-btn {
-      background: radial-gradient(circle at top left, #22c55e, #16a34a);
-      box-shadow: 0 8px 18px rgba(34, 197, 94, 0.45);
-      padding-inline: 18px;
+      background-color: var(--success);
+      box-shadow: 0 10px 24px rgba(22, 163, 74, 0.24), 0 3px 8px rgba(0, 0, 0, 0.35);
+      padding-inline: var(--pad-btn-x);
       font-size: 13px;
     }
 
     .save-btn:hover {
-      box-shadow: 0 10px 22px rgba(34, 197, 94, 0.6);
-      filter: brightness(1.03);
+      background-color: var(--success-hover);
+      box-shadow: 0 14px 30px rgba(22, 163, 74, 0.28), 0 4px 12px rgba(0, 0, 0, 0.38);
+    }
+
+    .stats-btn {
+      background-color: var(--primary);
+      box-shadow: var(--shadow-btn-primary);
+      font-size: 14px;
+    }
+
+    .stats-btn:hover {
+      background-color: var(--primary-hover);
+      box-shadow: var(--shadow-btn-primary-hover);
     }
 
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.55);
+      background: var(--modal-backdrop);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -381,53 +482,302 @@
     }
 
     .modal-content {
-      background: linear-gradient(145deg, #022c22, #022c22);
-      padding: 22px 28px 20px;
-      border-radius: 16px;
-      box-shadow: 0 22px 45px rgba(6, 78, 59, 0.85);
-      border: 1px solid rgba(52, 211, 153, 0.5);
+      background-color: var(--surface-overlay);
+      padding: var(--space-lg) var(--space-xl) var(--space-md);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--border-color);
       text-align: center;
       min-width: 260px;
     }
 
     .modal-icon {
       font-size: 36px;
-      margin-bottom: 8px;
-      color: #4ade80;
+      margin-bottom: var(--space-sm);
+      color: var(--modal-success-icon);
     }
 
     .modal-text {
       font-size: 15px;
-      color: #bbf7d0;
+      color: var(--modal-success-text);
+      font-weight: 500;
+    }
+
+    .analytics-modal {
+      width: min(980px, 94vw);
+      padding: 20px;
+      text-align: left;
+      border-radius: 16px;
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      box-shadow: 0 22px 40px rgba(0, 0, 0, 0.45);
+      font-family: "Inter", system-ui, sans-serif;
+    }
+
+    .analytics-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      gap: 10px;
+    }
+
+    .analytics-title {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 700;
+      color: #eeeef2;
+      background: linear-gradient(135deg, #630af4, #8b5cf6, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .analytics-close {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid #334155;
+      background: #232323;
+      color: #eeeef2;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .analytics-close:hover {
+      background: #ef4444;
+      border-color: #ef4444;
+    }
+
+    .analytics-subtitle {
+      color: #bebebe;
+      font-size: 13px;
+      margin: 0 0 16px;
+    }
+
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .analytics-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .analytics-calendar-card {
+      background: #232323;
+      border: 1px solid #2a2a2a;
+      border-radius: 12px;
+      padding: 10px;
+      min-width: 280px;
+    }
+
+    .analytics-date-label {
+      margin: 0 0 8px;
+      color: #bebebe;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .analytics-date-value {
+      color: #eeeef2;
+      font-weight: 600;
+    }
+
+    #analytics-calendar {
+      width: 100%;
+    }
+
+    #analytics-calendar .flatpickr-calendar {
+      width: 100%;
+      box-shadow: none;
+      border: 1px solid var(--border-color);
+      background: var(--bg-card);
+      color: #ffffff;
+    }
+
+    #analytics-calendar .flatpickr-months,
+    #analytics-calendar .flatpickr-weekdays,
+    #analytics-calendar .flatpickr-weekdaycontainer,
+    #analytics-calendar .flatpickr-days {
+      background: var(--bg-card);
+      color: #ffffff;
+    }
+
+    #analytics-calendar .flatpickr-current-month,
+    #analytics-calendar .flatpickr-current-month .flatpickr-monthDropdown-months,
+    #analytics-calendar .flatpickr-current-month input.cur-year {
+      color: #ffffff;
+      fill: #ffffff;
+      font-weight: 600;
+      background: var(--bg-card);
+    }
+
+    #analytics-calendar .flatpickr-monthDropdown-months:hover,
+    #analytics-calendar .numInputWrapper:hover {
+      background: rgba(99, 102, 241, 0.14);
+    }
+
+    #analytics-calendar .flatpickr-weekday {
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    #analytics-calendar .flatpickr-day {
+      color: #ffffff;
+      border-color: transparent;
+    }
+
+    #analytics-calendar .flatpickr-day:hover {
+      background: rgba(99, 102, 241, 0.2);
+      border-color: rgba(99, 102, 241, 0.35);
+    }
+
+    #analytics-calendar .flatpickr-day.prevMonthDay,
+    #analytics-calendar .flatpickr-day.nextMonthDay {
+      color: #94a3b8;
+    }
+
+    #analytics-calendar .flatpickr-day.selected,
+    #analytics-calendar .flatpickr-day.startRange,
+    #analytics-calendar .flatpickr-day.endRange {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #ffffff;
+    }
+
+    #analytics-calendar .flatpickr-day:focus {
+      border-color: var(--primary);
+      background: rgba(99, 102, 241, 0.25);
+    }
+
+    #analytics-calendar .flatpickr-day.today {
+      border-color: var(--primary-hover);
+    }
+
+    #analytics-calendar .flatpickr-months .flatpickr-prev-month svg,
+    #analytics-calendar .flatpickr-months .flatpickr-next-month svg {
+      fill: #ffffff;
+    }
+
+    .analytics-footer {
+      margin-top: 14px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .analytics-back-btn {
+      min-width: 140px;
+      height: 38px;
+      border-radius: 10px;
+      border: 1px solid #334155;
+      background: #232323;
+      color: #eeeef2;
+      font-family: "Onest", "Inter", sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .analytics-back-btn:hover {
+      border-color: var(--primary);
+      color: #fff;
+      background: rgba(99, 102, 241, 0.2);
+    }
+
+    .analytics-chart-card {
+      background: #232323;
+      border: 1px solid #2a2a2a;
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .analytics-chart-title {
+      margin: 0 0 8px;
+      color: #eeeef2;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+
+    .analytics-chart {
+      width: 100%;
+      height: 260px;
+      border-radius: 10px;
+      background: #1a1a1a;
+      overflow: hidden;
+    }
+
+    .analytics-legend {
+      margin-top: 8px;
+      color: #aaaaaa;
+      font-size: 12px;
+      line-height: 1.4;
+      font-family: "Inter", system-ui, sans-serif;
+    }
+
+    .legend-bolezn {
+      color: #630AF4;
+      font-weight: 600;
+    }
+
+    .legend-zayavlenie {
+      color: #10B981;
+      font-weight: 600;
+    }
+
+    .legend-neuvazh {
+      color: #EF4444;
+      font-weight: 600;
     }
 
     .top-bar {
       text-align: center;
-      margin-bottom: 16px;
-      position: relative;
-      z-index: 1;
+      margin-bottom: var(--space-md);
+    }
+
+    .card-header .admin-toolbar {
+      margin-bottom: 0;
     }
 
     .logout-btn {
       margin-top: 0;
-      background: radial-gradient(circle at top left, #f97373, #ef4444);
-      box-shadow: 0 4px 12px rgba(229, 57, 53, 0.3);
+      background-color: var(--danger);
+      box-shadow: 0 10px 24px rgba(239, 68, 68, 0.24), 0 3px 8px rgba(0, 0, 0, 0.35);
       padding-inline: 14px;
       font-size: 13px;
     }
 
     .logout-btn:hover {
-      box-shadow: 0 6px 16px rgba(229, 57, 53, 0.34);
-      filter: brightness(1.02);
+      background-color: var(--danger-hover);
+      box-shadow: 0 14px 30px rgba(239, 68, 68, 0.28), 0 4px 12px rgba(0, 0, 0, 0.38);
     }
 
     .admin-toolbar {
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 10px;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-sm);
       text-align: center;
+    }
+
+    .admin-toolbar-label {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-right: var(--space-xs);
     }
 
     .admin-toolbar label {
@@ -435,29 +785,30 @@
     }
 
     .clear-btn {
-      background: transparent;
-      border-radius: 999px;
-      padding: 4px 10px;
+      background-color: rgba(15, 23, 42, 0.45);
+      border-radius: var(--radius);
+      padding: var(--space-xs) var(--space-sm);
       font-size: 12px;
-      border: 1px solid rgba(148, 163, 184, 0.5);
+      border: 1px solid var(--border-color);
       box-shadow: none;
-      color: #e5e7eb;
+      color: var(--text-main);
     }
 
     .clear-btn:hover {
-      box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.7);
-      filter: none;
+      background-color: var(--surface-elevated);
+      border-color: var(--text-muted);
+      box-shadow: none;
       transform: none;
     }
 
     .status-select {
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.9);
+      border-radius: var(--radius);
+      background-color: var(--surface-elevated);
       font-size: 13px;
-      padding-inline: 12px;
+      padding-inline: var(--space-md);
+      max-width: 220px;
     }
 
-    /* Десктоп: контейнеры до ~1000px, по центру (max-width + var из :root) */
     @media (min-width: 1025px) {
       #login-page.container {
         max-width: min(var(--login-width), 1000px);
@@ -468,10 +819,9 @@
       }
     }
 
-    /* Планшет: ширина ~90%, крупнее зона нажатия у кнопок */
     @media (max-width: 1024px) {
       body {
-        padding: 0 12px 32px;
+        padding: 0 var(--pad-page-x) 32px;
       }
 
       #login-page.container,
@@ -486,13 +836,26 @@
       .save-btn,
       .clear-btn {
         min-height: 44px;
-        padding-top: 10px;
-        padding-bottom: 10px;
+        padding-top: var(--space-sm);
+        padding-bottom: var(--space-sm);
       }
 
       .actions-row .logout-btn,
-      .actions-row .save-btn {
-        min-height: 44px;
+      .actions-row .save-btn,
+      .actions-row .stats-btn {
+        width: 160px !important;
+        min-width: 160px;
+        max-width: 160px;
+        height: 40px !important;
+        min-height: 40px;
+        max-height: 40px;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px !important;
+        font-weight: 600;
       }
 
       .admin-toolbar {
@@ -501,17 +864,9 @@
       }
     }
 
-    /* Смартфон: узкий контейнер, крупный текст и поля под палец */
     @media (max-width: 480px) {
       body {
         font-size: 17px;
-        padding: 0 4px 20px;
-      }
-
-      .container {
-        max-width: 98%;
-        width: 100%;
-        padding: 10px;
       }
 
       #login-page.container,
@@ -592,17 +947,33 @@
       }
 
       .actions-row {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-        padding: 8px 2px 4px;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: nowrap;
+        gap: var(--space-sm);
+        padding: var(--space-sm) 0 var(--space-xs);
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
       }
 
       .actions-row .logout-btn,
-      .actions-row .save-btn {
-        width: 100%;
-        max-width: 100%;
-        min-height: 44px;
+      .actions-row .save-btn,
+      .actions-row .stats-btn {
+        flex: 0 0 auto;
+        width: 160px !important;
+        min-width: 160px;
+        max-width: 160px;
+        height: 40px !important;
+        min-height: 40px;
+        max-height: 40px;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px !important;
+        font-weight: 600;
       }
 
       .save-error {
@@ -613,7 +984,7 @@
       .admin-toolbar {
         flex-direction: column;
         align-items: stretch;
-        gap: 10px;
+        gap: var(--space-sm);
       }
 
       .admin-toolbar .status-select {
@@ -622,16 +993,24 @@
       }
 
       .table-wrapper {
-        max-height: min(450px, 50vh);
+        max-height: min(var(--table-max-height), 50vh);
       }
 
       .modal-content {
         max-width: 92vw;
-        margin: 0 12px;
+        margin: 0 var(--space-md);
       }
 
       .modal-text {
         font-size: 16px;
+      }
+
+      .analytics-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .analytics-calendar-card {
+        min-width: 100%;
       }
     }
   </style>
@@ -639,73 +1018,117 @@
 <body>
   <!-- Блок входа -->
   <div class="container" id="login-page">
-    <h1>Вход</h1>
-    <p class="subtitle">Введите данные аккаунта администратора журнала</p>
-    <div class="login-form">
-      <div id="login-error" class="error" style="display:none;"></div>
+    <div class="card">
+      <h1>Вход</h1>
+      <p class="subtitle">Введите данные аккаунта администратора журнала</p>
+      <div class="login-form">
+        <div id="login-error" class="error" style="display:none;"></div>
 
-      <div class="form-group">
-        <label for="login">Логин</label>
-        <input type="text" id="login" />
-      </div>
+        <div class="form-group">
+          <label for="login">Логин</label>
+          <input type="text" id="login" />
+        </div>
 
-      <div class="form-group">
-        <label for="password">Пароль</label>
-        <input type="password" id="password" />
-      </div>
+        <div class="form-group">
+          <label for="password">Пароль</label>
+          <input type="password" id="password" />
+        </div>
 
-      <div class="login-actions">
-        <button id="login-btn">Войти</button>
+        <div class="login-actions">
+          <button id="login-btn">Войти</button>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- Главная страница с таблицей -->
   <div class="container" id="main-page" style="display:none;">
-    <div class="top-bar">
-      <h2 id="class-title">Журнал посещаемости</h2>
-    </div>
+    <div class="card card-header">
+      <div class="top-bar">
+        <h2 id="class-title">Журнал посещаемости</h2>
+      </div>
 
-    <!-- Панель администратора: выбор класса + ручной сброс -->
-    <div id="admin-panel" style="display:none;">
-      <div class="admin-toolbar">
-        <label for="admin-class-select" style="font-size:13px; color: var(--text-muted); margin-right: 6px;">
-          Выберите класс:
-        </label>
-        <select id="admin-class-select" class="status-select" style="max-width: 220px;">
-          <!-- варианты классов подставляются скриптом -->
-        </select>
-        <button id="clear-table-btn" class="clear-btn" type="button">Сбросить таблицу вручную</button>
+      <div id="admin-panel" style="display:none;">
+        <div class="admin-toolbar">
+          <label for="admin-class-select" class="admin-toolbar-label">
+            Выберите класс:
+          </label>
+          <select id="admin-class-select" class="status-select">
+            <!-- варианты классов подставляются скриптом -->
+          </select>
+          <button id="clear-table-btn" class="clear-btn" type="button">Сбросить таблицу вручную</button>
+        </div>
       </div>
     </div>
 
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th>№</th>
-            <th>ФИО ученика</th>
-            <th>Дата</th>
-            <th>Статус</th>
-          </tr>
-        </thead>
-        <tbody id="students-body">
-          <!-- строки учеников будут подставляться скриптом -->
-        </tbody>
-      </table>
+    <div class="card card--flush">
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>№</th>
+              <th>ФИО ученика</th>
+              <th>Дата</th>
+              <th>Статус</th>
+            </tr>
+          </thead>
+          <tbody id="students-body">
+            <!-- строки учеников будут подставляться скриптом -->
+          </tbody>
+        </table>
+      </div>
     </div>
 
-    <div class="actions-row">
-      <button class="logout-btn" id="logout-btn">Выйти</button>
-      <button class="save-btn" id="save-report-btn">Сохранить отчет</button>
+    <div class="card">
+      <div class="actions-row">
+        <button class="stats-btn" id="stats-btn" type="button">Статистика</button>
+        <button class="logout-btn" id="logout-btn">Выйти</button>
+        <button class="save-btn" id="save-report-btn">Сохранить отчет</button>
+      </div>
+      <div id="save-error" class="save-error" style="display:none;">Ошибка связи с таблицей</div>
     </div>
-    <div id="save-error" class="save-error" style="display:none;">Ошибка связи с таблицей</div>
   </div>
 
   <div class="modal-backdrop" id="save-modal">
     <div class="modal-content">
       <div class="modal-icon">✔</div>
       <div class="modal-text">Список сохранён!</div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="analytics-modal">
+    <div class="analytics-modal">
+      <div class="analytics-header">
+        <h3 class="analytics-title">Статистика посещаемости</h3>
+        <button class="analytics-close" id="analytics-close-btn" type="button">×</button>
+      </div>
+      <p class="analytics-subtitle">Выберите дату в календаре — графики ниже обновятся с анимацией.</p>
+      <div class="analytics-toolbar">
+        <div class="analytics-calendar-card">
+          <p class="analytics-date-label">
+            📅 Дата статистики:
+            <span class="analytics-date-value" id="analytics-date-label"></span>
+          </p>
+          <div id="analytics-calendar"></div>
+        </div>
+      </div>
+      <div class="analytics-grid">
+        <div class="analytics-chart-card">
+          <div class="analytics-chart" id="absence-pie-chart"></div>
+          <div class="analytics-legend">
+            <span class="legend-bolezn">Болезнь</span> /
+            <span class="legend-zayavlenie">Заявление</span> /
+            <span class="legend-neuvazh">Неуважительная</span>
+          </div>
+        </div>
+        <div class="analytics-chart-card">
+          <div class="analytics-chart" id="absence-bar-chart"></div>
+          <div class="analytics-legend">Сравнение суммарного количества отсутствующих по классам</div>
+        </div>
+      </div>
+      <div class="analytics-footer">
+        <button class="analytics-back-btn" id="analytics-back-btn" type="button">Назад к журналу</button>
+      </div>
     </div>
   </div>
 
@@ -726,6 +1149,16 @@
     const saveModal = document.getElementById('save-modal');
     const saveError = document.getElementById('save-error');
     const clearTableBtn = document.getElementById('clear-table-btn');
+    const statsBtn = document.getElementById('stats-btn');
+    const analyticsModal = document.getElementById('analytics-modal');
+    const analyticsCloseBtn = document.getElementById('analytics-close-btn');
+    const analyticsBackBtn = document.getElementById('analytics-back-btn');
+    const absencePieChart = document.getElementById('absence-pie-chart');
+    const absenceBarChart = document.getElementById('absence-bar-chart');
+    const analyticsCalendar = document.getElementById('analytics-calendar');
+    const analyticsDateLabel = document.getElementById('analytics-date-label');
+    let analyticsSelectedDate = getTodayKey();
+    let analyticsDatePicker = null;
 
     // Конфигурация пользователей и классов
     const USERS = [
@@ -944,6 +1377,217 @@
       }
     }
 
+    function createSeededRandom(seed) {
+      let s = seed % 2147483647;
+      if (s <= 0) s += 2147483646;
+      return () => {
+        s = (s * 16807) % 2147483647;
+        return (s - 1) / 2147483646;
+      };
+    }
+
+    function getDateSeed(dateKey) {
+      return Number(dateKey.replace(/-/g, '')) || 1;
+    }
+
+    function getMockAnalyticsData(dateKey) {
+      const rand = createSeededRandom(getDateSeed(dateKey));
+      const bolezn = Math.floor(rand() * 13) + 2;
+      const zayavlenie = Math.floor(rand() * 10) + 1;
+      const neuvazh = Math.floor(rand() * 7) + 1;
+      const totalAbsence = bolezn + zayavlenie + neuvazh;
+
+      return {
+        reasons: [
+          { label: 'Болезнь', value: bolezn, color: '#630AF4' },
+          { label: 'Заявление', value: zayavlenie, color: '#10B981' },
+          { label: 'Неуважительная', value: neuvazh, color: '#EF4444' }
+        ],
+        byClass: [
+          { label: '10 «А»', value: Math.max(1, Math.floor(totalAbsence * (0.28 + rand() * 0.2))), color: '#630AF4' },
+          { label: '10 «Б»', value: Math.max(1, Math.floor(totalAbsence * (0.28 + rand() * 0.2))), color: '#3B82F6' },
+          { label: '10 «В»', value: Math.max(1, Math.floor(totalAbsence * (0.28 + rand() * 0.2))), color: '#10B981' }
+        ],
+        totalAbsence
+      };
+    }
+
+    // TODO: заменить mock на реальные данные за выбранную дату
+    function buildAnalyticsData(dateKey) {
+      return getMockAnalyticsData(dateKey);
+    }
+
+    function renderPieChart(data) {
+      if (!absencePieChart || typeof d3 === 'undefined') return;
+      const container = absencePieChart;
+      container.innerHTML = '';
+
+      const width = container.clientWidth || 320;
+      const height = container.clientHeight || 260;
+      const radius = Math.min(width, height) / 2 - 18;
+      const total = data.reduce((sum, item) => sum + item.value, 0);
+
+      const svg = d3
+        .select(container)
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height);
+
+      const g = svg
+        .append('g')
+        .attr('transform', `translate(${width / 2}, ${height / 2})`);
+
+      const pie = d3.pie().value(d => d.value).sort(null);
+      const arc = d3.arc().innerRadius(radius * 0.58).outerRadius(radius).cornerRadius(5);
+
+      g.selectAll('path')
+        .data(pie(data))
+        .join('path')
+        .attr('fill', d => d.data.color)
+        .attr('opacity', 0.95)
+        .transition()
+        .duration(520)
+        .ease(d3.easeCubicOut)
+        .attrTween('d', function(d) {
+          const interp = d3.interpolate(
+            { startAngle: d.startAngle, endAngle: d.startAngle },
+            d
+          );
+          return t => arc(interp(t));
+        })
+        .attr('opacity', 0.9);
+
+      g.append('text')
+        .attr('text-anchor', 'middle')
+        .attr('fill', '#EEEEF2')
+        .attr('font-size', 24)
+        .attr('font-weight', 700)
+        .attr('font-family', 'Inter, sans-serif')
+        .text(total.toLocaleString('ru-RU'));
+
+      g.append('text')
+        .attr('text-anchor', 'middle')
+        .attr('dy', 18)
+        .attr('fill', '#BEBEBE')
+        .attr('font-size', 11)
+        .attr('font-family', 'Inter, sans-serif')
+        .text('всего отсутствий');
+    }
+
+    function renderBarChart(data) {
+      if (!absenceBarChart || typeof d3 === 'undefined') return;
+      const container = absenceBarChart;
+      container.innerHTML = '';
+
+      const width = container.clientWidth || 320;
+      const height = container.clientHeight || 260;
+      const margin = { top: 30, right: 12, bottom: 32, left: 36 };
+      const innerWidth = width - margin.left - margin.right;
+      const innerHeight = height - margin.top - margin.bottom;
+
+      const svg = d3
+        .select(container)
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height);
+
+      const g = svg
+        .append('g')
+        .attr('transform', `translate(${margin.left}, ${margin.top})`);
+
+      const x = d3
+        .scaleBand()
+        .domain(data.map(d => d.label))
+        .range([0, innerWidth])
+        .padding(0.28);
+
+      const y = d3
+        .scaleLinear()
+        .domain([0, d3.max(data, d => d.value) || 0])
+        .nice()
+        .range([innerHeight, 0]);
+
+      g.append('g')
+        .call(d3.axisLeft(y).ticks(5).tickSize(-innerWidth))
+        .call(axis => axis.select('.domain').remove())
+        .call(axis => axis.selectAll('.tick line')
+          .attr('stroke', '#3F3F46')
+          .attr('stroke-opacity', 0.5)
+          .attr('stroke-dasharray', '3,3'))
+        .call(axis => axis.selectAll('.tick text')
+          .attr('fill', '#BEBEBE')
+          .attr('font-family', 'Inter, sans-serif')
+          .attr('font-size', 11));
+
+      g.append('g')
+        .attr('transform', `translate(0, ${innerHeight})`)
+        .call(d3.axisBottom(x).tickSize(0))
+        .call(axis => axis.select('.domain').remove())
+        .call(axis => axis.selectAll('.tick text')
+          .attr('fill', '#BEBEBE')
+          .attr('font-family', 'Inter, sans-serif')
+          .attr('font-size', 12)
+          .attr('dy', '1.2em'));
+
+      g.selectAll('rect')
+        .data(data)
+        .join('rect')
+        .attr('x', d => x(d.label) || 0)
+        .attr('width', x.bandwidth())
+        .attr('y', innerHeight)
+        .attr('height', 0)
+        .attr('rx', 4)
+        .attr('fill', d => d.color)
+        .attr('opacity', 0.9)
+        .transition()
+        .duration(540)
+        .ease(d3.easeCubicOut)
+        .attr('y', d => y(d.value))
+        .attr('height', d => innerHeight - y(d.value));
+
+      g.selectAll('.bar-value')
+        .data(data)
+        .join('text')
+        .attr('class', 'bar-value')
+        .attr('x', d => (x(d.label) || 0) + x.bandwidth() / 2)
+        .attr('y', d => Math.max(y(d.value) + 16, innerHeight - 12))
+        .attr('text-anchor', 'middle')
+        .attr('fill', '#FFFFFF')
+        .attr('font-size', 20)
+        .attr('font-family', 'Inter, sans-serif')
+        .attr('font-weight', 700)
+        .attr('dominant-baseline', 'middle')
+        .text(d => d.value.toLocaleString('ru-RU'));
+    }
+
+    function updateAnalyticsDateLabel(dateKey) {
+      const [y, m, d] = dateKey.split('-');
+      analyticsDateLabel.textContent = `${d}.${m}.${y}`;
+    }
+
+    function ensureAnalyticsCalendar() {
+      if (!analyticsCalendar || typeof flatpickr === 'undefined' || analyticsDatePicker) return;
+      analyticsDatePicker = flatpickr(analyticsCalendar, {
+        inline: true,
+        defaultDate: analyticsSelectedDate,
+        dateFormat: 'Y-m-d',
+        locale: (typeof flatpickr !== 'undefined' && flatpickr.l10ns && flatpickr.l10ns.ru) ? flatpickr.l10ns.ru : 'ru',
+        onChange: (selectedDates, dateStr) => {
+          if (!dateStr) return;
+          analyticsSelectedDate = dateStr;
+          renderAnalytics(dateStr);
+        }
+      });
+    }
+
+    function renderAnalytics(dateKey = analyticsSelectedDate) {
+      analyticsSelectedDate = dateKey;
+      updateAnalyticsDateLabel(dateKey);
+      const analyticsData = buildAnalyticsData(dateKey);
+      renderPieChart(analyticsData.reasons);
+      renderBarChart(analyticsData.byClass);
+    }
+
     function renderTableForClass(classConfig) {
       const statuses = loadStatuses(classConfig.classId);
       studentsBody.innerHTML = '';
@@ -1106,6 +1750,30 @@
       adminPanel.style.display = 'none';
       currentRole = null;
       saveError.style.display = 'none';
+      analyticsModal.classList.remove('visible');
+    });
+
+    statsBtn.addEventListener('click', () => {
+      analyticsModal.classList.add('visible');
+      ensureAnalyticsCalendar();
+      if (analyticsDatePicker) {
+        analyticsDatePicker.setDate(analyticsSelectedDate, false);
+      }
+      renderAnalytics(analyticsSelectedDate);
+    });
+
+    analyticsCloseBtn.addEventListener('click', () => {
+      analyticsModal.classList.remove('visible');
+    });
+
+    analyticsBackBtn.addEventListener('click', () => {
+      analyticsModal.classList.remove('visible');
+    });
+
+    analyticsModal.addEventListener('click', (e) => {
+      if (e.target === analyticsModal) {
+        analyticsModal.classList.remove('visible');
+      }
     });
 
     // Кнопка "Сбросить таблицу вручную" (для админа, текущий выбранный класс)
