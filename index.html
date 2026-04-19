@@ -2,17 +2,22 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <!-- script-src: 'unsafe-inline' нужен для встроенного скрипта страницы; без внешнего .js строгий CSP ломает приложение -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src https://fonts.gstatic.com data:; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://fonts.googleapis.com; img-src 'self' data: blob:; worker-src blob:;">
   <title>Журнал посещаемости</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
   <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     :root {
       /* Палитра Modern Dark SaaS */
@@ -100,18 +105,31 @@
       box-sizing: border-box;
     }
 
+    html {
+      background-color: #0b0f1a;
+      background:
+        radial-gradient(circle at top, rgba(99, 102, 241, 0.16), transparent 34%),
+        linear-gradient(180deg, #111827 0%, var(--bg-main) 38%, #020617 100%);
+      min-height: 100%;
+    }
+
     body {
       font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background-color: #0b0f1a;
       background:
         radial-gradient(circle at top, rgba(99, 102, 241, 0.16), transparent 34%),
         linear-gradient(180deg, #111827 0%, var(--bg-main) 38%, #020617 100%);
       margin: 0;
       min-height: 100vh;
+      min-height: 100dvh;
       display: flex;
       align-items: flex-start;
       justify-content: center;
       color: var(--text-main);
-      padding: 0 var(--pad-page-x) var(--pad-page-b);
+      padding-top: env(safe-area-inset-top);
+      padding-left: var(--pad-page-x);
+      padding-right: var(--pad-page-x);
+      padding-bottom: calc(var(--pad-page-b) + env(safe-area-inset-bottom));
     }
 
     .container {
@@ -505,6 +523,9 @@
 
     .analytics-modal {
       width: min(980px, 94vw);
+      max-height: 90vh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
       padding: 20px;
       text-align: left;
       border-radius: 16px;
@@ -512,6 +533,11 @@
       border: 1px solid #2a2a2a;
       box-shadow: 0 22px 40px rgba(0, 0, 0, 0.45);
       font-family: "Inter", system-ui, sans-serif;
+    }
+
+    #analytics-modal {
+      padding-top: 20px;
+      padding-bottom: 20px;
     }
 
     .analytics-header {
@@ -571,6 +597,100 @@
       gap: 12px;
       align-items: flex-start;
       margin-bottom: 12px;
+    }
+
+    .student-stats-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+    }
+
+    .student-stats-head {
+      margin: 0 0 10px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-main);
+      font-family: "Inter", system-ui, sans-serif;
+    }
+
+    .student-stats-label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      font-family: "Inter", system-ui, sans-serif;
+    }
+
+    .student-stats-select {
+      width: 100%;
+      max-width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      background: var(--surface-elevated);
+      color: var(--text-main);
+      font-size: 14px;
+      font-family: "Inter", system-ui, sans-serif;
+      outline: none;
+      margin-bottom: 14px;
+    }
+
+    .student-stats-select:focus {
+      border-color: var(--primary);
+      box-shadow: var(--shadow-input-focus);
+    }
+
+    .student-stats-kpis {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .student-stat-pill {
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      background: var(--surface-elevated);
+      padding: 10px 8px;
+      text-align: center;
+    }
+
+    .student-stat-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      font-family: "Inter", system-ui, sans-serif;
+    }
+
+    .student-stat-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-main);
+      font-family: "Inter", system-ui, sans-serif;
+      line-height: 1.1;
+    }
+
+    .student-stat-pill.student-stat-bolezn .student-stat-label {
+      color: #630af4;
+    }
+
+    .student-stat-pill.student-stat-zayavlenie .student-stat-label {
+      color: #10b981;
+    }
+
+    .student-stat-pill.student-stat-neuvazh .student-stat-label {
+      color: #ef4444;
+    }
+
+    .student-stats-hint {
+      margin: 10px 0 0;
+      font-size: 11px;
+      line-height: 1.45;
+      color: var(--text-muted);
+      font-family: "Inter", system-ui, sans-serif;
     }
 
     .analytics-calendar-card {
@@ -671,10 +791,100 @@
       fill: #ffffff;
     }
 
+    .quarter-presets .q-btn {
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: #e2e8f0;
+      font-family: "Inter", system-ui, sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .quarter-presets .q-btn:hover {
+      border-color: var(--primary);
+      color: #fff;
+      background: rgba(99, 102, 241, 0.2);
+    }
+
+    .quarter-presets .q-btn.active {
+      border-color: var(--primary);
+      background: rgba(99, 102, 241, 0.35);
+      color: #fff;
+      box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.4);
+    }
+
+    .stats-range-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px 16px;
+      margin-bottom: 12px;
+    }
+
+    .stats-range-row label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    .stats-range-row input[type="date"] {
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      background: #0f172a;
+      color: #f1f5f9;
+      font-family: "Inter", system-ui, sans-serif;
+      font-size: 13px;
+    }
+
+    .stats-range-row input[type="date"]:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: var(--shadow-input-focus);
+    }
+
     .analytics-footer {
       margin-top: 14px;
       display: flex;
-      justify-content: flex-end;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .analytics-pdf-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      padding: 0 18px;
+      border-radius: 10px;
+      border: 1px solid rgba(99, 102, 241, 0.5);
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.35), rgba(79, 70, 229, 0.45));
+      color: #f8fafc;
+      font-family: "Inter", system-ui, sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .analytics-pdf-btn:hover {
+      border-color: #a5b4fc;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.5), rgba(79, 70, 229, 0.65));
+      box-shadow: 0 6px 18px rgba(99, 102, 241, 0.22);
+    }
+
+    .analytics-pdf-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
     }
 
     .analytics-back-btn {
@@ -821,7 +1031,10 @@
 
     @media (max-width: 1024px) {
       body {
-        padding: 0 var(--pad-page-x) 32px;
+        padding-top: env(safe-area-inset-top);
+        padding-left: var(--pad-page-x);
+        padding-right: var(--pad-page-x);
+        padding-bottom: calc(32px + env(safe-area-inset-bottom));
       }
 
       #login-page.container,
@@ -1007,10 +1220,35 @@
 
       .analytics-grid {
         grid-template-columns: 1fr;
+        margin-bottom: 24px;
+        gap: 20px;
+      }
+
+      .analytics-grid .analytics-chart-card {
+        margin-bottom: 20px;
+      }
+
+      .analytics-grid .analytics-chart-card:last-child {
+        margin-bottom: 28px;
       }
 
       .analytics-calendar-card {
         min-width: 100%;
+      }
+
+      .student-stats-kpis {
+        grid-template-columns: 1fr;
+      }
+
+      .analytics-footer {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .analytics-pdf-btn,
+      .analytics-back-btn {
+        width: 100%;
+        justify-content: center;
       }
     }
   </style>
@@ -1026,12 +1264,12 @@
 
         <div class="form-group">
           <label for="login">Логин</label>
-          <input type="text" id="login" />
+          <input type="text" id="login" maxlength="50" autocomplete="username" />
         </div>
 
         <div class="form-group">
           <label for="password">Пароль</label>
-          <input type="password" id="password" />
+          <input type="password" id="password" maxlength="128" autocomplete="current-password" />
         </div>
 
         <div class="login-actions">
@@ -1083,7 +1321,7 @@
       <div class="actions-row">
         <button class="stats-btn" id="stats-btn" type="button">Статистика</button>
         <button class="logout-btn" id="logout-btn">Выйти</button>
-        <button class="save-btn" id="save-report-btn">Сохранить отчет</button>
+        <button class="save-btn" id="save-report-btn" type="button">Сохранить отчет</button>
       </div>
       <div id="save-error" class="save-error" style="display:none;">Ошибка связи с таблицей</div>
     </div>
@@ -1104,6 +1342,22 @@
       </div>
       <p class="analytics-subtitle">Выберите дату в календаре — графики ниже обновятся с анимацией.</p>
       <div class="analytics-toolbar">
+        <div class="analytics-calendar-card" style="width: 100%; max-width: 100%;">
+          <div class="quarter-presets" style="display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;">
+            <button type="button" class="q-btn" data-start="2025-09-01" data-end="2025-11-01">I четверть</button>
+            <button type="button" class="q-btn" data-start="2025-11-10" data-end="2025-12-24">II четверть</button>
+            <button type="button" class="q-btn" data-start="2026-01-08" data-end="2026-03-21">III четверть</button>
+            <button type="button" class="q-btn" data-start="2026-03-30" data-end="2026-05-31">IV четверть</button>
+          </div>
+          <div class="stats-range-row">
+            <label for="stats-start-date">Начало периода
+              <input type="date" id="stats-start-date" />
+            </label>
+            <label for="stats-end-date">Конец периода
+              <input type="date" id="stats-end-date" />
+            </label>
+          </div>
+        </div>
         <div class="analytics-calendar-card">
           <p class="analytics-date-label">
             📅 Дата статистики:
@@ -1111,6 +1365,28 @@
           </p>
           <div id="analytics-calendar"></div>
         </div>
+      </div>
+      <div class="student-stats-card">
+        <h4 class="student-stats-head">Статистика по ученику</h4>
+        <label class="student-stats-label" for="student-stats-select">Выберите ученика</label>
+        <select id="student-stats-select" class="student-stats-select"></select>
+        <div class="student-stats-kpis">
+          <div class="student-stat-pill student-stat-bolezn">
+            <span class="student-stat-label">Болезнь</span>
+            <span class="student-stat-value" id="student-stat-bolezn">0</span>
+          </div>
+          <div class="student-stat-pill student-stat-zayavlenie">
+            <span class="student-stat-label">Заявление</span>
+            <span class="student-stat-value" id="student-stat-zayavlenie">0</span>
+          </div>
+          <div class="student-stat-pill student-stat-neuvazh">
+            <span class="student-stat-label">Неуважительная</span>
+            <span class="student-stat-value" id="student-stat-neuvazh">0</span>
+          </div>
+        </div>
+        <p class="student-stats-hint">
+          Выбрав ученика, вы можете посмотреть его статистику пропусков по трём категориям.
+        </p>
       </div>
       <div class="analytics-grid">
         <div class="analytics-chart-card">
@@ -1127,6 +1403,7 @@
         </div>
       </div>
       <div class="analytics-footer">
+        <button class="analytics-pdf-btn" id="download-pdf-btn" type="button">Скачать PDF</button>
         <button class="analytics-back-btn" id="analytics-back-btn" type="button">Назад к журналу</button>
       </div>
     </div>
@@ -1157,6 +1434,10 @@
     const absenceBarChart = document.getElementById('absence-bar-chart');
     const analyticsCalendar = document.getElementById('analytics-calendar');
     const analyticsDateLabel = document.getElementById('analytics-date-label');
+    const studentStatsSelect = document.getElementById('student-stats-select');
+    const studentStatBolezn = document.getElementById('student-stat-bolezn');
+    const studentStatZayavlenie = document.getElementById('student-stat-zayavlenie');
+    const studentStatNeuvazh = document.getElementById('student-stat-neuvazh');
     let analyticsSelectedDate = getTodayKey();
     let analyticsDatePicker = null;
 
@@ -1164,7 +1445,7 @@
     const USERS = [
       {
         login: '10b',
-        password: '10b',
+        passwordHash: 'YXR0ZW5kYW5jZV9qb3VybmFsX3NhbHRfdjE6MTBi',
         classId: '10B',
         className: '10 «Б»',
         students: [
@@ -1205,7 +1486,7 @@
       },
       {
         login: '10v',
-        password: '10v',
+        passwordHash: 'YXR0ZW5kYW5jZV9qb3VybmFsX3NhbHRfdjE6MTB2',
         classId: '10V',
         className: '10 «В»',
         students: [
@@ -1243,7 +1524,7 @@
       },
       {
         login: '10a',
-        password: '10a',
+        passwordHash: 'YXR0ZW5kYW5jZV9qb3VybmFsX3NhbHRfdjE6MTBh',
         classId: '10A',
         className: '10 «А»',
         students: [
@@ -1298,9 +1579,240 @@
 
     const STORAGE_PREFIX = 'attendance_journal_class_';
     const STORAGE_DATE_KEY = 'attendance_journal_last_date';
+    const STORAGE_STUDENT_TOTALS_PREFIX = 'attendance_journal_student_totals_';
+
+    /* ——— Безопасность: санитизация, хеш пароля, проверка localStorage ——— */
+    const PASSWORD_SALT = 'attendance_journal_salt_v1';
+    /** btoa(PASSWORD_SALT + ':' + пароль администратора) — пароль не хранится в открытом виде */
+    const ADMIN_PASSWORD_HASH = 'YXR0ZW5kYW5jZV9qb3VybmFsX3NhbHRfdjE6MTIz';
+
+    function sanitize(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function sanitizeDeep(val) {
+      if (val == null) return val;
+      if (typeof val === 'string') return sanitize(val);
+      if (Array.isArray(val)) return val.map(sanitizeDeep);
+      if (typeof val === 'object') {
+        const out = {};
+        Object.keys(val).forEach((k) => {
+          out[sanitizeDeep(k)] = sanitizeDeep(val[k]);
+        });
+        return out;
+      }
+      return val;
+    }
+
+    function hashPassword(pw) {
+      try {
+        return btoa(PASSWORD_SALT + ':' + String(pw));
+      } catch (e) {
+        return '';
+      }
+    }
+
+    const SUSPICIOUS_STORAGE_PATTERNS = [/<script/i, /javascript:/i, /\bon\w+\s*=/i];
+
+    function looksSuspiciousString(str) {
+      return SUSPICIOUS_STORAGE_PATTERNS.some((re) => re.test(String(str)));
+    }
+
+    function walkStringsForSuspicious(val) {
+      if (typeof val === 'string') {
+        if (looksSuspiciousString(val)) throw new Error('suspicious');
+        return;
+      }
+      if (Array.isArray(val)) {
+        val.forEach(walkStringsForSuspicious);
+        return;
+      }
+      if (val && typeof val === 'object') {
+        Object.keys(val).forEach((k) => {
+          walkStringsForSuspicious(k);
+          walkStringsForSuspicious(val[k]);
+        });
+      }
+    }
+
+    function validateLocalStorageOrReset() {
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (!key) continue;
+          const raw = localStorage.getItem(key);
+          if (raw == null) continue;
+          if (looksSuspiciousString(raw)) throw new Error('suspicious');
+          const t = raw.trim();
+          if (t.startsWith('{') || t.startsWith('[')) {
+            walkStringsForSuspicious(JSON.parse(raw));
+          }
+        }
+      } catch (e) {
+        try {
+          localStorage.clear();
+        } catch (_) {}
+        window.alert(
+          'Обнаружены повреждённые или небезопасные данные в локальном хранилище. Хранилище очищено.'
+        );
+      }
+    }
+
+    const ALLOWED_STATUS = new Set(['', 'bolezn', 'zayavlenie', 'neuvazh']);
+
+    function normalizeSanitizedStatus(value) {
+      const v = String(value || '').trim();
+      return ALLOWED_STATUS.has(v) ? v : '';
+    }
+
+    function validateStoredStatuses(obj) {
+      if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return {};
+      const out = {};
+      Object.keys(obj).forEach((k) => {
+        if (!/^\d+$/.test(k)) return;
+        out[k] = normalizeSanitizedStatus(obj[k]);
+      });
+      return out;
+    }
+
+    function validateLoginInput(raw) {
+      const s = String(raw || '').trim();
+      if (!s || s.length > 50) return null;
+      if (!/^[a-zA-Zа-яА-ЯёЁ0-9_.-]+$/.test(s)) return null;
+      return s;
+    }
+
+    function validatePasswordInput(raw) {
+      const s = String(raw || '');
+      if (s.length > 128) return null;
+      return s;
+    }
 
     function getStorageKey(classId) {
       return STORAGE_PREFIX + classId;
+    }
+
+    function getStudentTotalsStorageKey(classId) {
+      return STORAGE_STUDENT_TOTALS_PREFIX + classId;
+    }
+
+    function loadStudentTotalsMap(classId) {
+      try {
+        const raw = localStorage.getItem(getStudentTotalsStorageKey(classId));
+        if (!raw) return {};
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
+        return parsed;
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function saveStudentTotalsMap(classId, map) {
+      try {
+        const safe = sanitizeDeep(map);
+        localStorage.setItem(getStudentTotalsStorageKey(classId), JSON.stringify(safe));
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    function scanStatusSnapshotsFromLocalStorageForClass(classId) {
+      const base = getStorageKey(classId);
+      const merged = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (!key || (key !== base && !key.startsWith(base + '_'))) continue;
+        try {
+          const raw = localStorage.getItem(key);
+          if (!raw) continue;
+          const obj = JSON.parse(raw);
+          if (!obj || typeof obj !== 'object' || Array.isArray(obj)) continue;
+          Object.keys(obj).forEach((idx) => {
+            const st = obj[idx];
+            if (st !== 'bolezn' && st !== 'zayavlenie' && st !== 'neuvazh') return;
+            if (!merged[idx]) merged[idx] = { bolezn: 0, zayavlenie: 0, neuvazh: 0 };
+            merged[idx][st] += 1;
+          });
+        } catch (e) {
+          // skip malformed
+        }
+      }
+      return merged;
+    }
+
+    function ensureStudentTotalsInitialized(classId) {
+      const tKey = getStudentTotalsStorageKey(classId);
+      if (localStorage.getItem(tKey) != null) return;
+      const fromStorage = scanStatusSnapshotsFromLocalStorageForClass(classId);
+      saveStudentTotalsMap(classId, fromStorage);
+    }
+
+    function applyStudentTotalsDelta(classId, studentIndex, prevStatus, nextStatus) {
+      ensureStudentTotalsInitialized(classId);
+      const map = loadStudentTotalsMap(classId);
+      const idx = String(studentIndex);
+      if (!map[idx]) map[idx] = { bolezn: 0, zayavlenie: 0, neuvazh: 0 };
+      const dec = prevStatus === 'bolezn' || prevStatus === 'zayavlenie' || prevStatus === 'neuvazh' ? prevStatus : null;
+      const inc = nextStatus === 'bolezn' || nextStatus === 'zayavlenie' || nextStatus === 'neuvazh' ? nextStatus : null;
+      if (dec) map[idx][dec] = Math.max(0, (map[idx][dec] || 0) - 1);
+      if (inc) map[idx][inc] = Math.max(0, (map[idx][inc] || 0) + 1);
+      saveStudentTotalsMap(classId, map);
+    }
+
+    function clearStudentTotalsForClass(classId) {
+      try {
+        localStorage.removeItem(getStudentTotalsStorageKey(classId));
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    function populateStudentStatsSelect() {
+      if (!studentStatsSelect || !currentClassConfig) return;
+      studentStatsSelect.innerHTML = '';
+      const optAll = document.createElement('option');
+      optAll.value = '';
+      optAll.textContent = 'Весь класс';
+      studentStatsSelect.appendChild(optAll);
+      currentClassConfig.students.forEach((name, index) => {
+        const opt = document.createElement('option');
+        opt.value = String(index);
+        opt.textContent = name;
+        studentStatsSelect.appendChild(opt);
+      });
+      studentStatsSelect.selectedIndex = 0;
+    }
+
+    function updateStudentStatsPanel() {
+      if (!currentClassConfig || !studentStatsSelect || !studentStatBolezn) return;
+      ensureStudentTotalsInitialized(currentClassConfig.classId);
+      const idx = studentStatsSelect.value;
+      const map = loadStudentTotalsMap(currentClassConfig.classId);
+      if (idx === '') {
+        let b = 0;
+        let z = 0;
+        let n = 0;
+        currentClassConfig.students.forEach((_, i) => {
+          const row = map[String(i)] || { bolezn: 0, zayavlenie: 0, neuvazh: 0 };
+          b += Number(row.bolezn || 0);
+          z += Number(row.zayavlenie || 0);
+          n += Number(row.neuvazh || 0);
+        });
+        studentStatBolezn.textContent = b.toLocaleString('ru-RU');
+        studentStatZayavlenie.textContent = z.toLocaleString('ru-RU');
+        studentStatNeuvazh.textContent = n.toLocaleString('ru-RU');
+        return;
+      }
+      const row = map[idx] || { bolezn: 0, zayavlenie: 0, neuvazh: 0 };
+      studentStatBolezn.textContent = Number(row.bolezn || 0).toLocaleString('ru-RU');
+      studentStatZayavlenie.textContent = Number(row.zayavlenie || 0).toLocaleString('ru-RU');
+      studentStatNeuvazh.textContent = Number(row.neuvazh || 0).toLocaleString('ru-RU');
     }
 
     function loadStatuses(classId) {
@@ -1308,7 +1820,7 @@
         const raw = localStorage.getItem(getStorageKey(classId));
         if (!raw) return {};
         const parsed = JSON.parse(raw);
-        return parsed && typeof parsed === 'object' ? parsed : {};
+        return validateStoredStatuses(parsed);
       } catch (e) {
         return {};
       }
@@ -1316,7 +1828,8 @@
 
     function saveStatuses(classId, statuses) {
       try {
-        localStorage.setItem(getStorageKey(classId), JSON.stringify(statuses));
+        const safe = sanitizeDeep(validateStoredStatuses(statuses));
+        localStorage.setItem(getStorageKey(classId), JSON.stringify(safe));
       } catch (e) {
         // игнорируем ошибки localStorage
       }
@@ -1328,6 +1841,7 @@
       } catch (e) {
         // ignore
       }
+      clearStudentTotalsForClass(classId);
     }
 
     function clearStatusesForAllClasses() {
@@ -1351,7 +1865,8 @@
       }
     }
 
-    // Выполняем проверку и возможный сброс при загрузке страницы
+    // Проверка хранилища и возможный сброс при загрузке страницы
+    validateLocalStorageOrReset();
     ensureDailyReset();
 
     function applyRowStatusClass(tr, status) {
@@ -1565,6 +2080,262 @@
       analyticsDateLabel.textContent = `${d}.${m}.${y}`;
     }
 
+    function attendanceStatusToRu(value) {
+      if (value === 'bolezn') return 'Болезнь';
+      if (value === 'zayavlenie') return 'Заявление';
+      if (value === 'neuvazh') return 'Неуважительная причина';
+      return '— (нет отметки пропуска)';
+    }
+
+    function attendanceStatusToRuShort(value) {
+      if (value === 'bolezn') return 'Болезнь';
+      if (value === 'zayavlenie') return 'Заявление';
+      if (value === 'neuvazh') return 'Неуважительная';
+      return '—';
+    }
+
+    function formatDateKeyRu(dateKey) {
+      const parts = String(dateKey).split('-');
+      if (parts.length !== 3) return String(dateKey);
+      const [y, m, d] = parts;
+      return `${d}.${m}.${y}`;
+    }
+
+    function syncQuarterButtonActiveState() {
+      const sIn = document.getElementById('stats-start-date');
+      const eIn = document.getElementById('stats-end-date');
+      document.querySelectorAll('.quarter-presets .q-btn').forEach((b) => b.classList.remove('active'));
+      if (!sIn || !eIn) return;
+      const sv = sIn.value.trim();
+      const ev = eIn.value.trim();
+      if (!sv || !ev) return;
+      document.querySelectorAll('.quarter-presets .q-btn').forEach((b) => {
+        if (b.getAttribute('data-start') === sv && b.getAttribute('data-end') === ev) {
+          b.classList.add('active');
+        }
+      });
+    }
+
+    function applyQuarterPreset(btn) {
+      const start = btn.getAttribute('data-start');
+      const end = btn.getAttribute('data-end');
+      if (!start || !end) return;
+      const sIn = document.getElementById('stats-start-date');
+      const eIn = document.getElementById('stats-end-date');
+      if (sIn) sIn.value = start;
+      if (eIn) eIn.value = end;
+      document.querySelectorAll('.quarter-presets .q-btn').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      analyticsSelectedDate = end;
+      if (analyticsDatePicker) {
+        analyticsDatePicker.setDate(end, false);
+      }
+      renderAnalytics(end);
+    }
+
+    function resolvePdfQuarterLabel() {
+      const sIn = document.getElementById('stats-start-date');
+      const eIn = document.getElementById('stats-end-date');
+      if (!sIn || !eIn) return null;
+      const sv = sIn.value.trim();
+      const ev = eIn.value.trim();
+      if (!sv || !ev) return null;
+      const presets = document.querySelectorAll('.quarter-presets .q-btn');
+      for (let i = 0; i < presets.length; i++) {
+        const b = presets[i];
+        if (b.getAttribute('data-start') === sv && b.getAttribute('data-end') === ev) {
+          return b.textContent.trim();
+        }
+      }
+      return null;
+    }
+
+    async function downloadStudentPDF() {
+      const studentSelect = document.getElementById('student-stats-select');
+      if (!studentSelect || !currentClassConfig) {
+        window.alert('Сначала войдите в журнал.');
+        return;
+      }
+
+      if (studentSelect.options.length === 0) {
+        populateStudentStatsSelect();
+      }
+
+      const rawVal = studentSelect.value.trim();
+      if (rawVal === '' || rawVal === 'Выберите ученика') {
+        window.alert('Сначала выбери ученика!');
+        return;
+      }
+
+      const optEl = studentSelect.selectedOptions[0];
+      const labelTrim = optEl && optEl.textContent ? optEl.textContent.trim() : '';
+      if (labelTrim === 'Весь класс' || labelTrim === 'Выберите ученика') {
+        window.alert('Сначала выбери ученика!');
+        return;
+      }
+
+      let studentIndex = -1;
+      let studentName = '';
+
+      if (/^\d+$/.test(rawVal)) {
+        studentIndex = Number(rawVal);
+        if (!Number.isInteger(studentIndex) || studentIndex < 0 || studentIndex >= currentClassConfig.students.length) {
+          window.alert('Сначала выбери ученика!');
+          return;
+        }
+        studentName = String(currentClassConfig.students[studentIndex]).trim();
+      } else {
+        studentName = rawVal;
+        studentIndex = currentClassConfig.students.findIndex((n) => String(n).trim() === studentName);
+        if (studentIndex < 0) {
+          window.alert('Сначала выбери ученика!');
+          return;
+        }
+      }
+
+      console.log('Выбранный ученик:', studentName);
+
+      let allData = {};
+      try {
+        const rawArchive = localStorage.getItem('attendanceData') || '{}';
+        if (looksSuspiciousString(rawArchive)) {
+          allData = {};
+        } else {
+          allData = JSON.parse(rawArchive);
+          if (allData && typeof allData === 'object') {
+            walkStringsForSuspicious(allData);
+          } else {
+            allData = {};
+          }
+        }
+      } catch (e) {
+        allData = {};
+      }
+
+      const tableBody = document.getElementById('pdf-table-body');
+      const template = document.getElementById('pdf-export-template');
+      if (!tableBody || !template) {
+        window.alert('Шаблон PDF не найден на странице.');
+        return;
+      }
+
+      if (typeof html2pdf === 'undefined') {
+        window.alert('Библиотека PDF не загружена. Обновите страницу.');
+        return;
+      }
+
+      tableBody.innerHTML = '';
+
+      const statusLabels = { bolezn: 'Болезнь', zayavlenie: 'Заявление', neuvazh: 'Неуважительная' };
+      const statusColors = { bolezn: '#10b981', zayavlenie: '#3b82f6', neuvazh: '#ef4444' };
+
+      let rowsFromArchive = 0;
+      if (allData && typeof allData === 'object') {
+        Object.keys(allData).sort().forEach((date) => {
+          const recs = allData[date];
+          if (!Array.isArray(recs)) return;
+          const studentRecord = recs.find(
+            (s) => s && String(s.name).trim() === studentName
+          );
+          if (studentRecord && studentRecord.status && studentRecord.status !== 'empty') {
+            const st = studentRecord.status;
+            if (st === 'bolezn' || st === 'zayavlenie' || st === 'neuvazh') {
+              rowsFromArchive++;
+              const row = document.createElement('tr');
+              row.innerHTML =
+                '<td style="padding: 10px; border-bottom: 1px solid #f1f5f9; font-size: 13px;">' +
+                String(date) +
+                '</td><td style="padding: 10px; border-bottom: 1px solid #f1f5f9; font-size: 13px; font-weight: 600; color: ' +
+                statusColors[st] +
+                '">' +
+                statusLabels[st] +
+                '</td>';
+              tableBody.appendChild(row);
+            }
+          }
+        });
+      }
+
+      if (rowsFromArchive === 0) {
+        ensureStudentTotalsInitialized(currentClassConfig.classId);
+        const statuses = loadStatuses(currentClassConfig.classId);
+        const periodRu = formatDateKeyRu(analyticsSelectedDate || getTodayKey());
+        const st = statuses[studentIndex] || '';
+        const row = document.createElement('tr');
+        if (st === 'bolezn' || st === 'zayavlenie' || st === 'neuvazh') {
+          row.innerHTML =
+            '<td style="padding: 10px; border-bottom: 1px solid #f1f5f9; font-size: 13px;">' +
+            periodRu +
+            '</td><td style="padding: 10px; border-bottom: 1px solid #f1f5f9; font-size: 13px; font-weight: 600; color: ' +
+            statusColors[st] +
+            '">' +
+            statusLabels[st] +
+            '</td>';
+        } else {
+          row.innerHTML =
+            '<td colspan="2" style="padding: 10px; border-bottom: 1px solid #f1f5f9; font-size: 13px; color: #64748b;">Нет отметки пропуска в журнале на выбранную дату в статистике (' +
+            periodRu +
+            ').</td>';
+        }
+        tableBody.appendChild(row);
+      }
+
+      ensureStudentTotalsInitialized(currentClassConfig.classId);
+      const totalsMap = loadStudentTotalsMap(currentClassConfig.classId);
+      const tRow = totalsMap[String(studentIndex)] || { bolezn: 0, zayavlenie: 0, neuvazh: 0 };
+
+      const nameEl = document.getElementById('pdf-student-name-display');
+      if (nameEl) {
+        nameEl.innerText = studentName + ' — ' + currentClassConfig.className;
+      }
+      const periodTitleEl = document.getElementById('pdf-period-title');
+      if (periodTitleEl) {
+        const qLabel = resolvePdfQuarterLabel();
+        if (qLabel) {
+          periodTitleEl.innerText = 'Отчет за: ' + qLabel;
+        } else {
+          const sIn = document.getElementById('stats-start-date');
+          const eIn = document.getElementById('stats-end-date');
+          const sv = sIn && sIn.value ? formatDateKeyRu(sIn.value.trim()) : '';
+          const ev = eIn && eIn.value ? formatDateKeyRu(eIn.value.trim()) : '';
+          if (sv && ev) {
+            periodTitleEl.innerText = 'Период: ' + sv + ' — ' + ev;
+          } else {
+            periodTitleEl.innerText = 'Дата: ' + formatDateKeyRu(analyticsSelectedDate || getTodayKey());
+          }
+        }
+      }
+      document.getElementById('pdf-total-b').innerText = String(tRow.bolezn || 0);
+      document.getElementById('pdf-total-z').innerText = String(tRow.zayavlenie || 0);
+      document.getElementById('pdf-total-n').innerText = String(tRow.neuvazh || 0);
+      document.getElementById('pdf-gen-date').innerText = 'Создано: ' + new Date().toLocaleDateString('ru-RU');
+
+      const safeName = String(studentName).replace(/[/\\?%*:|"<>]/g, '_').trim() || 'student';
+      const opt = {
+        margin: [10, 10],
+        filename: `Otchet_${safeName}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      try {
+        await new Promise((resolve, reject) => {
+          window.setTimeout(() => {
+            html2pdf()
+              .from(template)
+              .set(opt)
+              .save()
+              .then(resolve)
+              .catch(reject);
+          }, 200);
+        });
+      } catch (e) {
+        console.warn('html2pdf', e);
+        window.alert('Не удалось сформировать PDF.');
+      }
+    }
+
     function ensureAnalyticsCalendar() {
       if (!analyticsCalendar || typeof flatpickr === 'undefined' || analyticsDatePicker) return;
       analyticsDatePicker = flatpickr(analyticsCalendar, {
@@ -1575,6 +2346,13 @@
         onChange: (selectedDates, dateStr) => {
           if (!dateStr) return;
           analyticsSelectedDate = dateStr;
+          const eIn = document.getElementById('stats-end-date');
+          if (eIn) eIn.value = dateStr;
+          const sIn = document.getElementById('stats-start-date');
+          if (sIn && sIn.value && dateStr < sIn.value) {
+            sIn.value = dateStr;
+          }
+          syncQuarterButtonActiveState();
           renderAnalytics(dateStr);
         }
       });
@@ -1633,9 +2411,15 @@
 
         select.addEventListener('change', () => {
           const updatedStatuses = loadStatuses(classConfig.classId);
-          updatedStatuses[index] = select.value;
+          const prevStatus = updatedStatuses[index] || '';
+          const nextStatus = select.value;
+          applyStudentTotalsDelta(classConfig.classId, index, prevStatus, nextStatus);
+          updatedStatuses[index] = nextStatus;
           saveStatuses(classConfig.classId, updatedStatuses);
-          applyRowStatusClass(tr, select.value);
+          applyRowStatusClass(tr, nextStatus);
+          if (analyticsModal.classList.contains('visible')) {
+            updateStudentStatsPanel();
+          }
         });
 
         tdStatus.appendChild(select);
@@ -1650,11 +2434,19 @@
     }
 
     loginBtn.addEventListener('click', () => {
-      const login = loginInput.value.trim();
-      const password = passwordInput.value;
+      const passwordRaw = passwordInput.value;
+      const validPassword = validatePasswordInput(passwordRaw);
+      const validLogin = validateLoginInput(loginInput.value);
+      if (validPassword == null || validLogin == null) {
+        loginError.textContent = 'Неверный формат логина или пароля (длина или недопустимые символы).';
+        loginError.style.display = 'block';
+        return;
+      }
+      const login = validLogin;
+      const password = validPassword;
 
-      // Приоритетный админский вход
-      if (login === 'admin' && password === '123') {
+      // Приоритетный админский вход (пароль — только как хеш btoa)
+      if (login === 'admin' && hashPassword(password) === ADMIN_PASSWORD_HASH) {
         currentRole = 'admin';
         currentLogin = 'admin';
         loginError.style.display = 'none';
@@ -1691,8 +2483,9 @@
       }
 
       // Обычный вход (староста конкретного класса)
+      const passHash = hashPassword(password);
       const foundUser = USERS.find(
-        (u) => u.login === login && u.password === password
+        (u) => u.login === login && u.passwordHash === passHash
       );
 
       if (foundUser) {
@@ -1728,6 +2521,11 @@
       currentClassConfig = cls;
       classTitle.textContent = `Журнал посещаемости: ${cls.className}`;
       renderTableForClass(cls);
+      if (analyticsModal.classList.contains('visible')) {
+        ensureStudentTotalsInitialized(cls.classId);
+        populateStudentStatsSelect();
+        updateStudentStatsPanel();
+      }
     });
 
     // По Enter тоже вход
@@ -1756,11 +2554,64 @@
     statsBtn.addEventListener('click', () => {
       analyticsModal.classList.add('visible');
       ensureAnalyticsCalendar();
+      const sd = document.getElementById('stats-start-date');
+      const ed = document.getElementById('stats-end-date');
+      if (sd && ed) {
+        if (!ed.value) ed.value = analyticsSelectedDate;
+        if (!sd.value) sd.value = analyticsSelectedDate;
+        syncQuarterButtonActiveState();
+      }
       if (analyticsDatePicker) {
         analyticsDatePicker.setDate(analyticsSelectedDate, false);
       }
       renderAnalytics(analyticsSelectedDate);
+      if (currentClassConfig) {
+        ensureStudentTotalsInitialized(currentClassConfig.classId);
+        populateStudentStatsSelect();
+        updateStudentStatsPanel();
+      }
     });
+
+    document.querySelectorAll('.quarter-presets .q-btn').forEach((btn) => {
+      btn.addEventListener('click', () => applyQuarterPreset(btn));
+    });
+
+    const statsStartInput = document.getElementById('stats-start-date');
+    const statsEndInput = document.getElementById('stats-end-date');
+    if (statsStartInput) {
+      statsStartInput.addEventListener('change', () => {
+        const sVal = statsStartInput.value;
+        let eVal = statsEndInput && statsEndInput.value ? statsEndInput.value : analyticsSelectedDate;
+        if (sVal && eVal && sVal > eVal && statsEndInput) {
+          statsEndInput.value = sVal;
+          eVal = sVal;
+        }
+        syncQuarterButtonActiveState();
+        const pick = eVal || analyticsSelectedDate;
+        analyticsSelectedDate = pick;
+        if (analyticsDatePicker) analyticsDatePicker.setDate(pick, false);
+        renderAnalytics(pick);
+      });
+    }
+    if (statsEndInput) {
+      statsEndInput.addEventListener('change', () => {
+        const pick = statsEndInput.value || analyticsSelectedDate;
+        const sVal = statsStartInput && statsStartInput.value;
+        if (sVal && pick && pick < sVal && statsStartInput) {
+          statsStartInput.value = pick;
+        }
+        syncQuarterButtonActiveState();
+        analyticsSelectedDate = pick;
+        if (analyticsDatePicker) analyticsDatePicker.setDate(pick, false);
+        renderAnalytics(pick);
+      });
+    }
+
+    if (studentStatsSelect) {
+      studentStatsSelect.addEventListener('change', () => {
+        updateStudentStatsPanel();
+      });
+    }
 
     analyticsCloseBtn.addEventListener('click', () => {
       analyticsModal.classList.remove('visible');
@@ -1783,7 +2634,7 @@
       renderTableForClass(currentClassConfig);
     });
 
-    // Кнопка "Сохранить отчет"
+    // Кнопка "Сохранить отчет" — отправка в таблицу и сохранение в localStorage
     saveReportBtn.addEventListener('click', async () => {
       if (!currentClassConfig) return;
 
@@ -1793,7 +2644,6 @@
       saveReportBtn.textContent = 'Отправка...';
       saveReportBtn.disabled = true;
 
-      // Собираем данные из таблицы
       const statuses = {};
       const absentList = [];
       const rows = studentsBody.querySelectorAll('tr');
@@ -1805,18 +2655,18 @@
         statuses[index] = value;
 
         if (value) {
+          const nameFromConfig = String(currentClassConfig.students[index] || '');
           absentList.push({
-            name: currentClassConfig.students[index],
+            name: sanitize(nameFromConfig).slice(0, 50),
             status: value
           });
         }
       });
 
-      // 1) Сначала отправляем в Google Таблицу (только непустые)
       const payload = {
         secret: 'lil_freat_sdelal_eto',
-        className: currentClassConfig.className,
-        user: currentLogin,
+        className: sanitize(String(currentClassConfig.className || '')).slice(0, 80),
+        user: currentLogin != null ? sanitize(String(currentLogin)).slice(0, 50) : '',
         absentList
       };
 
@@ -1824,7 +2674,7 @@
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 12000);
 
-        const resp = await fetch(GOOGLE_SCRIPT_URL, {
+        await fetch(GOOGLE_SCRIPT_URL, {
           method: 'POST',
           mode: 'no-cors',
           headers: { 'Content-Type': 'text/plain' },
@@ -1834,12 +2684,8 @@
 
         clearTimeout(timeoutId);
 
-        // В режиме no-cors ответ будет opaque, поэтому считаем успехом факт выполнения запроса без исключения.
-
-        // 2) Потом сохраняем в localStorage (все статусы)
         saveStatuses(currentClassConfig.classId, statuses);
 
-        // Успех: показываем зелёную галочку (как раньше)
         saveModal.classList.add('visible');
         setTimeout(() => {
           saveModal.classList.remove('visible');
@@ -1851,7 +2697,72 @@
         saveReportBtn.disabled = false;
       }
     });
+
+    const pdfBtn = document.getElementById('download-pdf-btn');
+    if (pdfBtn) {
+      pdfBtn.onclick = function () {
+        downloadStudentPDF();
+      };
+    }
+
+    if (loginInput) {
+      loginInput.addEventListener('input', () => {
+        loginInput.value = loginInput.value.replace(/[^a-zA-Zа-яА-ЯёЁ0-9_.-]/g, '');
+      });
+    }
+
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'F12') e.preventDefault();
+      if (e.ctrlKey && e.shiftKey) {
+        const k = e.key;
+        if (k === 'I' || k === 'J' || k === 'C' || k === 'i' || k === 'j' || k === 'c') e.preventDefault();
+      }
+    });
   </script>
+
+  <div style="position: absolute; left: -9999px; top: 0;">
+    <div id="pdf-export-template" style="width: 700px; padding: 40px; background: white; color: #1a1a1a; font-family: 'Inter', Arial, sans-serif;">
+      <div style="border-bottom: 3px solid #6366f1; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end;">
+        <div>
+          <h1 style="margin: 0; color: #111827; font-size: 28px; letter-spacing: -0.5px;">ОТЧЕТ ПОСЕЩАЕМОСТИ</h1>
+          <p style="margin: 5px 0 0 0; color: #6366f1; font-weight: 600; font-size: 14px; text-transform: uppercase;">Персональная выгрузка системы</p>
+        </div>
+        <div style="text-align: right; color: #6b7280; font-size: 12px;" id="pdf-gen-date"></div>
+      </div>
+
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 30px;">
+        <div style="font-size: 11px; color: #94a3b8; text-transform: uppercase; font-weight: 700; margin-bottom: 8px;">Студент / Группа</div>
+        <div style="font-size: 22px; font-weight: 700; color: #1e293b;" id="pdf-student-name-display">Имя Фамилия</div>
+        <div id="pdf-period-title" style="font-size: 13px; color: #475569; margin-top: 12px; font-weight: 600;"></div>
+      </div>
+
+      <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+        <thead>
+          <tr>
+            <th style="text-align: left; padding: 12px; background: #1e293b; color: white; font-size: 13px; border-radius: 8px 0 0 0;">Дата занятия</th>
+            <th style="text-align: left; padding: 12px; background: #1e293b; color: white; font-size: 13px; border-radius: 0 8px 0 0;">Причина пропуска</th>
+          </tr>
+        </thead>
+        <tbody id="pdf-table-body"></tbody>
+      </table>
+
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 40px;">
+        <div style="border: 1px solid #e2e8f0; border-radius: 10px; padding: 15px; text-align: center;">
+          <div style="font-size: 11px; color: #64748b; text-transform: uppercase; margin-bottom: 5px;">Болезнь (Б)</div>
+          <div style="font-size: 20px; font-weight: 700; color: #10b981;" id="pdf-total-b">0</div>
+        </div>
+        <div style="border: 1px solid #e2e8f0; border-radius: 10px; padding: 15px; text-align: center;">
+          <div style="font-size: 11px; color: #64748b; text-transform: uppercase; margin-bottom: 5px;">Заявление (З)</div>
+          <div style="font-size: 20px; font-weight: 700; color: #3b82f6;" id="pdf-total-z">0</div>
+        </div>
+        <div style="border: 1px solid #e2e8f0; border-radius: 10px; padding: 15px; text-align: center;">
+          <div style="font-size: 11px; color: #64748b; text-transform: uppercase; margin-bottom: 5px;">Прогул (Н)</div>
+          <div style="font-size: 20px; font-weight: 700; color: #ef4444;" id="pdf-total-n">0</div>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
 
