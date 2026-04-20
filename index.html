@@ -174,47 +174,61 @@
     }
 
     .login-entrance {
+      opacity: 1;
+      transform: translateX(var(--login-enter-x)) translateY(0);
+    }
+
+    .login-entrance-active {
       opacity: 0;
       transform: translateX(var(--login-enter-x)) translateY(20px);
       animation: fadeInUp 0.8s ease-out 0.3s forwards;
+      animation-fill-mode: forwards;
     }
 
     .login-entrance .card > * {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .login-entrance-active .card > * {
       opacity: 0;
       transform: translateY(10px);
       animation: fadeInUpItem 0.55s ease-out forwards;
+      animation-fill-mode: forwards;
     }
 
-    .login-entrance .card > *:nth-child(1) {
+    .login-entrance-active .card > *:nth-child(1) {
       animation-delay: 0.45s;
     }
 
-    .login-entrance .card > *:nth-child(2) {
+    .login-entrance-active .card > *:nth-child(2) {
       animation-delay: 0.55s;
     }
 
-    .login-entrance .card > *:nth-child(3) {
+    .login-entrance-active .card > *:nth-child(3) {
       animation-delay: 0.65s;
     }
 
-    .login-entrance .form-group {
+    .login-entrance-active .form-group {
       opacity: 0;
       transform: translateY(10px);
       animation: fadeInUpItem 0.5s ease-out forwards;
+      animation-fill-mode: forwards;
     }
 
-    .login-entrance .form-group:nth-child(2) {
+    .login-entrance-active .form-group:nth-child(2) {
       animation-delay: 0.72s;
     }
 
-    .login-entrance .form-group:nth-child(3) {
+    .login-entrance-active .form-group:nth-child(3) {
       animation-delay: 0.8s;
     }
 
-    .login-entrance .login-actions {
+    .login-entrance-active .login-actions {
       opacity: 0;
       transform: translateY(10px);
       animation: fadeInUpItem 0.5s ease-out 0.88s forwards;
+      animation-fill-mode: forwards;
     }
 
     @keyframes fadeInUp {
@@ -1415,7 +1429,7 @@
 </head>
 <body>
   <!-- Блок входа -->
-  <div class="container login-entrance" id="login-page">
+  <div class="container login-entrance login-entrance-active" id="login-page">
     <div class="card">
       <h1>Вход</h1>
       <p class="subtitle">Введите данные аккаунта администратора журнала</p>
@@ -2648,6 +2662,7 @@
 
         loginInput.value = '';
         passwordInput.value = '';
+        loginPage.classList.remove('login-entrance-active');
         loginPage.style.display = 'none';
         window.setTimeout(() => {
           mainPage.style.display = 'block';
@@ -2678,6 +2693,7 @@
 
         loginInput.value = '';
         passwordInput.value = '';
+        loginPage.classList.remove('login-entrance-active');
         loginPage.style.display = 'none';
         window.setTimeout(() => {
           mainPage.style.display = 'block';
@@ -2717,9 +2733,10 @@
     // Кнопка "Выйти"
     logoutBtn.addEventListener('click', () => {
       mainPage.style.display = 'none';
+      loginPage.classList.remove('login-entrance-active');
       window.setTimeout(() => {
         loginPage.style.display = 'block';
-        replayEntranceAnimation(loginPage, 'screen-fade-in');
+        replayEntranceAnimation(loginPage, 'login-entrance-active', 1200);
       }, 40);
       currentClassConfig = null;
       currentLogin = null;
